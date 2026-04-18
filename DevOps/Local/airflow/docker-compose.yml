@@ -17,13 +17,16 @@ x-airflow-common: &airflow-common
     AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth"
     PYTHONPATH: /opt/airflow/dags:/opt/airflow/plugins:/opt/airflow/engine
     # Engine package mounted into the container so DAGs can `import engine.wealthsignal`.
-    _PIP_ADDITIONAL_REQUIREMENTS: "mlflow==2.13.* torch==2.3.* great-expectations==0.18.*"
+    _PIP_ADDITIONAL_REQUIREMENTS: "mlflow==2.13.* torch==2.3.* great-expectations==0.18.* apache-airflow-providers-postgres==5.11.*"
+    # Pre-configured connection used by dags/ingestion/load_product_catalog.py.
+    AIRFLOW_CONN_WEALTHSIGNAL_POSTGRES: "postgresql+psycopg2://wealthsignal:wealthsignal@postgres:5432/wealthsignal"
 
   volumes:
     - ../../../airflow/dags:/opt/airflow/dags
     - ../../../airflow/plugins:/opt/airflow/plugins
     - ../../../airflow/config:/opt/airflow/config
     - ../../../engine:/opt/airflow/engine
+    - ../../../data:/opt/airflow/data:ro
     - ws-airflow-logs:/opt/airflow/logs
 
   networks:
