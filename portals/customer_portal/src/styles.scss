@@ -1,0 +1,104 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   WealthSignal Customer Portal — global tokens + Tailwind.
+   Fresh sky-blue + emerald + gold palette — approachable, optimistic.
+───────────────────────────────────────────────────────────────────────── */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --horizon: linear-gradient(135deg, #0EA5E9 0%, #06B6D4 45%, #10B981 100%);
+  --dawn:    linear-gradient(135deg, #F59E0B 0%, #F43F5E 55%, #8B5CF6 100%);
+  --dusk:    linear-gradient(135deg, #6366F1 0%, #0EA5E9 50%, #10B981 100%);
+  --shadow-panel: 0 4px 24px -8px rgba(15, 23, 42, 0.10), 0 2px 8px -2px rgba(14, 165, 233, 0.12);
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  color: #0F172A;
+  background:
+    radial-gradient(1200px 600px at 0% 0%,   rgba(14, 165, 233, 0.10), transparent 60%),
+    radial-gradient(900px  500px at 100% 0%, rgba(16, 185, 129, 0.08),  transparent 55%),
+    radial-gradient(800px  500px at 50% 100%, rgba(245, 158, 11, 0.06), transparent 60%),
+    #F8FCFF;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .ws-card {
+    @apply bg-white rounded-2xl shadow-panel border border-surface-200/70;
+  }
+  .ws-card-horizon {
+    @apply rounded-2xl shadow-panel text-white;
+    background: var(--horizon);
+  }
+
+  .ws-btn-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white
+           shadow-glow transition-all duration-250
+           hover:translate-y-[-1px] active:translate-y-0
+           disabled:opacity-60 disabled:cursor-not-allowed;
+    background: var(--horizon);
+  }
+  .ws-btn-accent {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white
+           shadow-soft transition-all duration-250
+           hover:brightness-110;
+    background: var(--dawn);
+  }
+  .ws-btn-ghost {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl font-medium
+           text-ink-700 bg-white/80 border border-surface-200
+           hover:bg-white hover:border-sky-300 hover:text-sky-700
+           transition-colors duration-200;
+  }
+
+  .ws-pill {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold;
+  }
+  .ws-pill-sky     { @apply bg-sky-500/10 text-sky-700; }
+  .ws-pill-emerald { @apply bg-emerald-500/10 text-emerald-600; }
+  .ws-pill-gold    { @apply bg-gold-500/15 text-gold-600; }
+  .ws-pill-coral   { @apply bg-coral-500/10 text-coral-500; }
+
+  .ws-topnav-link {
+    @apply px-4 py-2 rounded-xl font-semibold text-white/80
+           hover:text-white hover:bg-white/10 transition-colors duration-200;
+  }
+  .ws-topnav-link.active { @apply text-white bg-white/15; }
+
+  .ws-field {
+    @apply w-full px-4 py-3 rounded-xl border border-surface-300
+           bg-white text-ink-900 placeholder-ink-300
+           focus:outline-none focus:border-sky-500
+           focus:ring-4 focus:ring-sky-500/20
+           transition-all duration-200;
+  }
+
+  .ws-h1 {
+    @apply font-display text-3xl sm:text-5xl font-bold tracking-tight text-ink-900;
+  }
+  .ws-h2 {
+    @apply font-display text-2xl font-semibold tracking-tight text-ink-900;
+  }
+  .ws-subtle { @apply text-ink-500 text-sm; }
+
+  /* Product card */
+  .ws-product-card {
+    @apply ws-card p-5 transition-all duration-250
+           hover:shadow-[0_12px_32px_-8px_rgba(14,165,233,0.25)] hover:-translate-y-0.5
+           cursor-pointer;
+  }
+}
+
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.35), rgba(16, 185, 129, 0.35));
+  border-radius: 999px;
+  border: 2px solid #F8FCFF;
+}
+*::-webkit-scrollbar-track { background: transparent; }
