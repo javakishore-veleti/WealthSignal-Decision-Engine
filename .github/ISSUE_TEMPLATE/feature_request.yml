@@ -1,0 +1,51 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion. Please describe the problem and proposed solution.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Modelling (new model, architecture change, retrain cadence)
+        - Middleware API (admin_api / customer_api / data_management_api)
+        - Portal (admin_portal / customer_portal)
+        - Airflow DAG / pipeline
+        - MLflow / tracking / registry
+        - Observability (Grafana / Prometheus / Kibana)
+        - Infrastructure / DevOps
+        - Compliance / audit
+        - Developer experience
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What business or technical problem does this solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context, mockups, or links

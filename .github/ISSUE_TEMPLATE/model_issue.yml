@@ -1,0 +1,57 @@
+name: Model Performance Issue
+description: Report a regression or concern about a trained model's behaviour
+title: "[Model]: "
+labels: ["model", "triage"]
+body:
+  - type: dropdown
+    id: model
+    attributes:
+      label: Model
+      options:
+        - FormCompletionPredictor
+        - WealthAutoencoder (segmentation)
+        - FormActionLSTM (sequence)
+        - Customer-R1 RL Policy
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: mlflow
+    attributes:
+      label: MLflow run URL
+      placeholder: "http://mlflow-host/#/experiments/.../runs/..."
+    validations:
+      required: true
+
+  - type: input
+    id: dataset
+    attributes:
+      label: Dataset version (DVC hash)
+
+  - type: textarea
+    id: metrics
+    attributes:
+      label: Metrics — baseline vs observed
+      placeholder: |
+        |                     | Baseline | Observed |
+        |---------------------|----------|----------|
+        | ROC-AUC             |          |          |
+        | F1                  |          |          |
+        | Latency p95 (ms)    |          |          |
+    validations:
+      required: true
+
+  - type: textarea
+    id: investigation
+    attributes:
+      label: Investigation so far
+      description: Data-drift check? Feature-importance delta? Prompt changes? Hyperparameters?
+
+  - type: checkboxes
+    id: compliance
+    attributes:
+      label: Compliance
+      options:
+        - label: This report contains no PII or customer data.
+          required: true

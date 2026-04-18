@@ -1,0 +1,200 @@
+# Contributing to WealthSignal Decision Engine
+
+Thank you for contributing. This document describes the workflow, conventions, and quality gates for the repository.
+
+## Monorepo layout
+
+```
+middleware/              # FastAPI microservices (each is independently deployable)
+├── admin_api/           # Admin operations — model registry, promotions, audit ↔ admin_portal
+├── customer_api/        # Customer-facing scoring + offer triggers          ↔ customer_portal
+└── data_management_api/ # Async orchestration → submits jobs to Airflow
+                         # (ingestion, downloads, PyTorch training runs)
+
+portals/                 # User-facing front-ends
+├── admin_portal/        # Internal operations console (consumes admin_api)
+└── customer_portal/     # Customer digital form UI (consumes customer_api)
+
+airflow/                 # Apache Airflow — actual heavy-lifting compute
+├── dags/
+│   ├── ingestion/       # Kaggle pulls, DVC commits, Great Expectations validation
+│   ├── training/        # PyTorch training DAGs (form_classifier, segmentation,
+│   │                    #   sequence, rl_policy) — logged to MLflow
+│   └── scoring/         # Batch scoring + Model Registry promotions
+├── plugins/             # Custom Airflow operators (MLflowSubmitOperator etc.)
+└── config/              # Connections, variables, pool definitions
+
+engine/                  # ML core — imported by Airflow DAGs and (optionally) middleware
+└── wealthsignal/
+    ├── data/
+    ├── models/
+    ├── training/
+    └── serving/
+
+DevOps/                  # Local + cloud infrastructure
+└── Local/
+    ├── docker-all-up.sh         # Bring up every container
+    ├── docker-all-down.sh       # Tear down every container
+    ├── docker-all-status.sh     # Summary health of every container
+    ├── airflow/
+    │   └── docker-compose.yml   # Scheduler, webserver, worker, triggerer
+    ├── postgres/
+    │   └── docker-compose.yml   # Shared Postgres — Airflow metadata + app schemas
+    ├── kafka/
+    │   └── docker-compose.yml   # Kafka + Zookeeper + Schema Registry
+    └── Observability/
+        ├── Grafana/             # Dashboards (model-drift, API latency, DAG SLA)
+        ├── Prometheus/          # Metrics scrape config
+        └── Kibana/              # Elastic stack — structured log exploration
+
+tests/                   # Test mirrors source tree
+docs/                    # Architecture, model cards, API specs, runbooks
+```
+
+### Local developer setup
+
+Bring the entire stack up with a single command:
+
+```bash
+./DevOps/Local/docker-all-up.sh
+```
+
+That launches Postgres, Kafka, Airflow, Grafana, Prometheus, and Kibana. Each subdirectory's `docker-compose.yml` is composable — you can start a single service in isolation when iterating.
+
+Useful endpoints after startup:
+
+| Service     | URL                       |
+|-------------|---------------------------|
+| Airflow UI  | http://localhost:8080     |
+| MLflow UI   | http://localhost:5000     |
+| Grafana     | http://localhost:3000     |
+| Prometheus  | http://localhost:9090     |
+| Kibana      | http://localhost:5601     |
+| Postgres    | localhost:5432            |
+| Kafka       | localhost:9092            |
+
+### Service responsibility matrix
+
+| Component | Pairs with | Role | Heavy compute? |
+|---|---|---|---|
+| `admin_api` | `admin_portal` | Model registry ops, audit trail, promotions | No (metadata only) |
+| `customer_api` | `customer_portal` | Real-time scoring, offer trigger, session | No (calls Model Registry) |
+| `data_management_api` | *(async)* | Submit Airflow DAG runs, stream job status, present artefacts for download | No (orchestration only) |
+| Airflow DAGs | `data_management_api` | Ingestion, PyTorch training, batch scoring, DVC commits | **Yes** — all GPU / long-running work lives here |
+
+### Async job pattern (DataManagementApi → Airflow)
+
+1. Client → `POST /api/v1/jobs` (e.g. `{"dag": "train_form_classifier", "params": {...}}`)
+2. `data_management_api` triggers the DAG via Airflow REST API and returns `{"job_id": "...", "status": "queued"}`.
+3. Client polls `GET /api/v1/jobs/{job_id}` for status (`queued` → `running` → `succeeded|failed`).
+4. On completion, artefacts are fetched from MLflow / GCS / S3 and exposed via `GET /api/v1/jobs/{job_id}/artefacts`.
+
+All middleware services are built on **FastAPI** and share common patterns: Pydantic v2 schemas, MLflow tracking, structured logging via `structlog`, Docker images, OpenAPI specs, OpenTelemetry tracing.
+
+## Getting started
+
+1. Clone the repository and create a feature branch from `main`:
+   ```bash
+   git checkout -b feature/short-description
+   ```
+2. Create the Python environment:
+   ```bash
+   conda create -n wealthsignal python=3.11
+   conda activate wealthsignal
+   pip install -e ".[dev]"
+   pre-commit install
+   ```
+
+## Branch naming
+
+| Prefix | Purpose | Example |
+|---|---|---|
+| `feature/` | New features | `feature/form-classifier` |
+| `fix/` | Bug fixes | `fix/mlflow-null-metric` |
+| `model/` | Model experiments or retrains | `model/rl-policy-v2` |
+| `data/` | Data-pipeline changes | `data/home-credit-refresh` |
+| `api/` | Middleware service changes | `api/customer-api-scoring-endpoint` |
+| `portal/` | Portal / front-end changes | `portal/admin-model-registry-view` |
+| `dag/` | Airflow DAG changes | `dag/train-rl-policy-v2` |
+| `docs/` | Documentation | `docs/architecture-diagram` |
+| `chore/` | Tooling, CI, dependencies | `chore/upgrade-torch` |
+
+## Commit messages
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+- `feat(customer_api): add /predict/form-completion endpoint`
+- `fix(engine): handle null income in feature encoder`
+- `model(rl_policy): retrain on Q2 partial-form data`
+- `docs: add architecture diagram`
+- `chore(ci): upgrade ruff to 0.4`
+
+Scope in parentheses should match the affected top-level directory (`admin_api`, `customer_api`, `data_management_api`, `admin_portal`, `customer_portal`, `airflow`, `engine`, `ci`, `docs`).
+
+## Code style
+
+Automated via `pre-commit`:
+
+- **Black** — formatter (line length 100)
+- **Ruff** — linter
+- **mypy** — static type checker
+- **pytest** — test runner
+
+Run manually:
+```bash
+pre-commit run --all-files
+```
+
+## Testing
+
+- All new code requires **unit tests** under `tests/` mirroring the source tree.
+- FastAPI middleware services must include **integration tests** using `httpx.AsyncClient` against the app.
+- Integration tests that require MLflow, GPU, or external services must be marked `@pytest.mark.integration` and skipped in the default CI run.
+
+```bash
+pytest tests/ -v --cov=engine --cov=middleware
+```
+
+## FastAPI middleware conventions
+
+- Every service exposes `/health`, `/ready`, `/version`, and `/metrics`.
+- All request/response models use **Pydantic v2** with explicit field descriptions for OpenAPI.
+- Each endpoint is traced via OpenTelemetry and logged to MLflow where model inference occurs.
+- Each service ships a `Dockerfile` and a `docker-compose.yml` fragment for local dev.
+- API versioning via URL prefix: `/api/v1/...`.
+- `data_management_api` is **non-blocking** — every heavy operation returns a `job_id` immediately and defers execution to Airflow. No PyTorch training or data download happens inside the API process.
+
+## Airflow DAG conventions
+
+- DAGs live under `airflow/dags/` and are grouped by purpose (`ingestion/`, `training/`, `scoring/`).
+- Every DAG has `owner`, `tags=['wealthsignal', '<stream>']`, `retries`, `sla`, and a `doc_md` describing intent.
+- PyTorch training tasks import from `engine.wealthsignal` — no model code lives inside DAG files.
+- All runs log to MLflow via the shared `MLflowSubmitOperator` plugin.
+- DAG unit tests live under `tests/airflow/` and validate DAG structure without executing tasks.
+
+## ML model changes
+
+Any change that retrains or alters a production model **must**:
+
+1. Be logged to MLflow with a descriptive run name and tags (`phase`, `model`, `dataset`).
+2. Include before/after metrics in the PR description.
+3. Update the model card under `docs/model_cards/` if behaviour changes materially.
+4. Be reviewed by at least one ML engineer **and** one wealth-management domain stakeholder.
+
+## Pull-request process
+
+1. Ensure CI passes (lint + tests).
+2. Fill in every section of the PR template.
+3. Link the related issue (`Closes #...`).
+4. Request review from a CODEOWNER.
+5. Squash-and-merge after two approvals (one ML engineer + one domain reviewer).
+
+## Reporting issues
+
+- **Bugs** → use the *Bug Report* template.
+- **Feature requests** → use the *Feature Request* template.
+- **Security vulnerabilities** → use private GitHub Security Advisories. Do **not** file a public issue.
+
+## License
+
+By contributing, you agree that your contributions are licensed under the [Apache License 2.0](LICENSE).
