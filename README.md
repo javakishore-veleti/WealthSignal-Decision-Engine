@@ -123,11 +123,13 @@ The **full folder tree, pairing rules, and naming conventions** live in [CONTRIB
 ## Key design decisions
 
 - **Monorepo**, managed by the root `package.json` (operational only — npm workspaces point at the Angular portals).
-- **Middleware = FastAPI.** Every API (`admin_api`, `customer_api`, `data_management_api`) is built on FastAPI + Pydantic v2.
+- **Middleware = FastAPI.** Every API (`admin_api`, `customer_api`, `data_management_api`, and the upcoming `product_catalog_api`) is built on FastAPI + Pydantic v2.
 - **Portals = Angular 17.** TypeScript strict; two standalone Angular apps (`admin_portal`, `customer_portal`) managed as npm workspaces.
 - **All PyTorch compute runs in Apache Airflow.** Middleware never trains or does heavy feature engineering — it serves cached Model Registry artefacts or submits Airflow DAG runs.
 - **`data_management_api` is async-only.** Every heavy operation returns a `job_id` and defers execution to Airflow; clients poll for status.
-- **DevOps at the repo root.** `DevOps/Local/` ships docker-compose stacks for Airflow, Postgres, Kafka, Grafana, Prometheus, Kibana, plus `up`/`status`/`shutdown` lifecycle scripts used by the `npm run run:local:*` commands.
+- **DB migrations via Alembic (cloud-agnostic).** `db/alembic/` is the single migration timeline. A manual GitHub Actions workflow (`Database Migration`) applies it to `local`, `aws`, `azure`, or `gcp` — each is a GitHub Environment with its own `WEALTHSIGNAL_DB_URL` secret. `docker-all-up.sh` simulates the same workflow locally after Postgres becomes healthy.
+- **DevOps at the repo root.** `DevOps/Local/` ships docker-compose stacks for Airflow, Postgres, Kafka, Grafana, Prometheus, Elasticsearch, Kibana, and MLflow, plus `up`/`status`/`shutdown` lifecycle scripts used by the `npm run run:local:*` commands. All containers attach to a shared `wealthsignal-net` Docker network.
+- **Product Catalog** (in progress): a separate FastAPI service on port 8004 with CRUD + criteria + NLP search over ~10,000 wealth-management products. Data is generated programmatically (no per-product hardcoding) and written to a seed JSON; the Admin Portal exposes an **Initial Data Load Setup** action that triggers an Airflow DAG to **UPSERT** the catalogue into Postgres — idempotent, safe to re-run.
 - **Chat log preserved** in [README_Claude_Kishore_ChatLog.md](README_Claude_Kishore_ChatLog.md) — running record of collaboration decisions.
 
 ## Quick local start

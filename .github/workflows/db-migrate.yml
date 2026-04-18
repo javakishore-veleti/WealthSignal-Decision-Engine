@@ -1,0 +1,104 @@
+name: Database Migration
+
+# Runs Alembic against the selected target environment. Manual trigger only —
+# schema changes are never applied automatically. Each GitHub Environment
+# ('aws', 'azure', 'gcp') stores its own WEALTHSIGNAL_DB_URL secret pointing
+# at the respective managed Postgres (RDS / Azure Database for PostgreSQL /
+# Cloud SQL). Protection rules (required reviewers, wait timers) can be
+# attached to any of those environments in GitHub settings.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: "Target environment"
+        required: true
+        type: choice
+        default: local
+        options:
+          - local
+          - aws
+          - azure
+          - gcp
+      action:
+        description: "Alembic action"
+        required: true
+        type: choice
+        default: upgrade
+        options:
+          - upgrade
+          - downgrade
+          - current
+          - history
+          - stamp
+      revision:
+        description: "Revision argument (optional — defaults: upgrade→head, downgrade→-1, stamp→head)"
+        required: false
+        default: ""
+
+concurrency:
+  group: db-migrate-${{ inputs.target_env }}
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Alembic ${{ inputs.action }} @ ${{ inputs.target_env }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target_env }}
+
+    env:
+      # Pulled from the selected GitHub Environment's secrets. For `local`,
+      # this secret can hold the same value as the docker-compose fallback
+      # or be left unset — env.py will default to localhost.
+      WEALTHSIGNAL_DB_URL: ${{ secrets.WEALTHSIGNAL_DB_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install project (db extras)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[db]"
+
+      - name: Show current revision
+        working-directory: db
+        run: alembic current || true
+
+      - name: Run Alembic ${{ inputs.action }}
+        working-directory: db
+        run: |
+          set -euo pipefail
+          ACTION="${{ inputs.action }}"
+          REV="${{ inputs.revision }}"
+          case "$ACTION" in
+            upgrade)
+              alembic upgrade "${REV:-head}"
+              ;;
+            downgrade)
+              alembic downgrade "${REV:--1}"
+              ;;
+            stamp)
+              alembic stamp "${REV:-head}"
+              ;;
+            current)
+              alembic current
+              ;;
+            history)
+              alembic history --verbose
+              ;;
+            *)
+              echo "Unknown action: $ACTION" >&2; exit 1
+              ;;
+          esac
+
+      - name: Show post-migration revision
+        if: always()
+        working-directory: db
+        run: alembic current || true

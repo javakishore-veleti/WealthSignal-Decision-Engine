@@ -1,0 +1,115 @@
+# Observability stack — Prometheus + Grafana (metrics), Elasticsearch + Kibana
+# (logs), and the MLflow tracking server (experiment metadata). All services
+# attach to the shared 'wealthsignal-net' network.
+
+name: wealthsignal-observability
+
+services:
+  # ── Metrics ────────────────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    container_name: ws-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./Prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ws-prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.enable-lifecycle"
+    networks:
+      - wealthsignal-net
+
+  grafana:
+    image: grafana/grafana:10.4.3
+    container_name: ws-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+    volumes:
+      - ws-grafana-data:/var/lib/grafana
+      - ./Grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    networks:
+      - wealthsignal-net
+
+  # ── Logs ───────────────────────────────────────────────────────────────────
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: ws-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    volumes:
+      - ws-es-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks:
+      - wealthsignal-net
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    container_name: ws-kibana
+    restart: unless-stopped
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - wealthsignal-net
+
+  # ── Experiment tracking ────────────────────────────────────────────────────
+  mlflow:
+    # Community image that bundles MLflow + boto3 for artefact storage.
+    image: ghcr.io/mlflow/mlflow:v2.13.2
+    container_name: ws-mlflow
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      BACKEND_STORE_URI: postgresql://wealthsignal:wealthsignal@postgres:5432/wealthsignal?options=-csearch_path%3Dmlflow
+      ARTIFACT_ROOT: /mlflow/artefacts
+    volumes:
+      - ws-mlflow-artefacts:/mlflow/artefacts
+    command: >
+      mlflow server
+        --host 0.0.0.0
+        --port 5000
+        --backend-store-uri postgresql://wealthsignal:wealthsignal@postgres:5432/wealthsignal?options=-csearch_path%3Dmlflow
+        --artifacts-destination /mlflow/artefacts
+        --serve-artifacts
+    networks:
+      - wealthsignal-net
+
+volumes:
+  ws-prometheus-data:
+    name: ws-prometheus-data
+  ws-grafana-data:
+    name: ws-grafana-data
+  ws-es-data:
+    name: ws-es-data
+  ws-mlflow-artefacts:
+    name: ws-mlflow-artefacts
+
+networks:
+  wealthsignal-net:
+    external: true
+    name: wealthsignal-net

@@ -1,0 +1,16 @@
+# Dashboard provider — Grafana loads any JSON under /etc/grafana/dashboards at
+# startup. Dashboards will be added here as middleware services are built.
+
+apiVersion: 1
+
+providers:
+  - name: wealthsignal
+    orgId: 1
+    folder: WealthSignal
+    type: file
+    disableDeletion: false
+    editable: true
+    allowUiUpdates: true
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/dashboards

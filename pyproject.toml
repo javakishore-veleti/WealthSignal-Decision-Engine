@@ -28,6 +28,14 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
+# Database + migrations. Used by the local stack, CI workflow, and
+# cloud deployments (AWS RDS / Azure Postgres / GCP Cloud SQL).
+db = [
+    "alembic>=1.13",
+    "sqlalchemy>=2.0",
+    "psycopg[binary]>=3.1",
+]
+
 dev = [
     "ruff==0.4.*",
     "black==24.*",
@@ -36,6 +44,9 @@ dev = [
     "pytest-cov>=5.0",
     "pytest-asyncio>=0.23",
     "pre-commit>=3.7",
+    "alembic>=1.13",
+    "sqlalchemy>=2.0",
+    "psycopg[binary]>=3.1",
 ]
 
 [project.urls]

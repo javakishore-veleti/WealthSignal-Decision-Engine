@@ -1,0 +1,37 @@
+# Prometheus scrape configuration for the local stack.
+# Each FastAPI middleware service exposes /metrics (Prometheus format) via the
+# prometheus-fastapi-instrumentator library. Airflow's StatsD exporter and
+# Postgres exporter can be added here as those services mature.
+
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: wealthsignal-local
+    env: local
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Middleware services run on the host, scraped via host.docker.internal.
+  - job_name: wealthsignal-middleware
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - host.docker.internal:8001    # admin_api
+          - host.docker.internal:8002    # customer_api
+          - host.docker.internal:8003    # data_management_api
+          - host.docker.internal:8004    # product_catalog_api (coming next)
+        labels:
+          component: middleware
+
+  # MLflow health endpoint.
+  - job_name: mlflow
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["mlflow:5000"]
+        labels:
+          component: tracking

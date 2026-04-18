@@ -1,0 +1,47 @@
+# Shared Postgres instance — hosts:
+#   - Airflow metadata DB      (schema: airflow)
+#   - Product Catalog schema   (schema: product_catalog)
+#   - Application schemas      (schemas created by init.sql as they are added)
+#
+# Note: production deployments should use separate clusters per schema.
+# This single instance is intended for local development only.
+
+name: wealthsignal-postgres
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ws-postgres
+    hostname: postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: wealthsignal
+      POSTGRES_PASSWORD: wealthsignal
+      POSTGRES_DB: wealthsignal
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - ws-pg-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wealthsignal -d wealthsignal"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+    networks:
+      - wealthsignal-net
+
+volumes:
+  ws-pg-data:
+    name: ws-pg-data
+
+networks:
+  wealthsignal-net:
+    external: true
+    name: wealthsignal-net
