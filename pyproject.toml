@@ -25,7 +25,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-dependencies = []
+dependencies = [
+    "email-validator>=2.1",
+]
 
 [project.optional-dependencies]
 # Database + migrations. Used by the local stack, CI workflow, and
