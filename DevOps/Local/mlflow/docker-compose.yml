@@ -21,7 +21,10 @@ services:
     restart: unless-stopped
 
     ports:
-      - "5000:5000"
+      # Host port 5050 (not 5000) because macOS' AirPlay Receiver service
+      # binds 5000 by default. Container-internal port stays 5000, so every
+      # other container still reaches the server at http://ws-mlflow:5000.
+      - "5050:5000"
 
     environment:
       BACKEND_STORE_URI: postgresql://wealthsignal:wealthsignal@postgres:5432/wealthsignal?options=-csearch_path%3Dmlflow

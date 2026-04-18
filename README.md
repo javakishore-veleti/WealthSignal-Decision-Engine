@@ -159,7 +159,7 @@ Background processes write PIDs to `.local/pids/` and logs to `.local/logs/` (bo
 | Service     | URL                       |
 |-------------|---------------------------|
 | Airflow UI  | http://localhost:8080     |
-| MLflow UI   | http://localhost:5000     |
+| MLflow UI   | http://localhost:5050     |
 | Grafana     | http://localhost:3000     |
 | Prometheus  | http://localhost:9090     |
 | Kibana      | http://localhost:5601     |
