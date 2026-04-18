@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>WealthSignal · NPM Commands Reference</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --brand: #4F46E5;
+      --brand-dark: #3730A3;
+      --cyan: #06B6D4;
+      --emerald: #10B981;
+      --gold: #F59E0B;
+      --coral: #F97316;
+      --rose: #EF4444;
+      --ink-900: #0F172A;
+      --ink-700: #334155;
+      --ink-500: #64748B;
+      --ink-300: #94A3B8;
+      --surface-50: #FAFBFF;
+      --surface-100: #F4F6FB;
+      --surface-200: #E6E9F4;
+      --surface-300: #CDD3E5;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+      color: var(--ink-900);
+      background:
+        radial-gradient(1200px 600px at 0% 0%, rgba(79, 70, 229, 0.07), transparent 60%),
+        radial-gradient(900px 500px at 100% 0%, rgba(6, 182, 212, 0.07), transparent 55%),
+        radial-gradient(800px 500px at 50% 100%, rgba(245, 158, 11, 0.05), transparent 60%),
+        var(--surface-50);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 48px 24px 96px; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(120deg, #4F46E5 0%, #7C3AED 45%, #06B6D4 100%);
+      color: white;
+      border-radius: 24px;
+      padding: 48px 40px;
+      box-shadow: 0 24px 60px -20px rgba(79, 70, 229, 0.4);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+    .hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(400px 200px at 100% 0%, rgba(255,255,255,0.18), transparent 60%),
+        radial-gradient(300px 200px at 0% 100%, rgba(245,158,11,0.25), transparent 60%);
+      pointer-events: none;
+    }
+    .hero .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 4px 12px; border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      font-size: 12px; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 16px; position: relative;
+    }
+    .hero .eyebrow::before {
+      content: ""; height: 8px; width: 8px; border-radius: 999px;
+      background: #34D399;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+    }
+    .hero h1 {
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 12px;
+      position: relative;
+    }
+    .hero p {
+      font-size: 17px; line-height: 1.55;
+      max-width: 780px; margin: 0; opacity: 0.92;
+      position: relative;
+    }
+    .hero .muted {
+      margin-top: 16px; font-size: 14px; opacity: 0.85;
+      padding: 12px 16px; border-radius: 12px;
+      background: rgba(0, 0, 0, 0.15);
+      display: inline-block;
+      position: relative;
+    }
+
+    /* Section */
+    section { margin-bottom: 44px; }
+
+    .sec-head {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 18px;
+    }
+    .sec-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 44px; width: 44px; border-radius: 14px;
+      color: white; font-size: 18px; font-weight: 700;
+      box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.25);
+    }
+    .sec-head h2 {
+      font-family: "Space Grotesk", sans-serif;
+      margin: 0; font-size: 26px; font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .sec-head .sub {
+      font-size: 14px; color: var(--ink-500); margin-top: 2px;
+    }
+
+    /* Cards / tables */
+    .card {
+      background: white;
+      border: 1px solid rgba(230, 233, 244, 0.8);
+      border-radius: 18px;
+      box-shadow: 0 4px 24px -8px rgba(15, 23, 42, 0.10), 0 2px 8px -2px rgba(99, 102, 241, 0.08);
+      overflow: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left;
+      font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.14em; font-weight: 700;
+      color: var(--ink-500);
+      padding: 14px 20px;
+      background: var(--surface-50);
+      border-bottom: 1px solid var(--surface-200);
+    }
+    tbody td {
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(230, 233, 244, 0.5);
+      vertical-align: top;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: rgba(238, 242, 255, 0.5); }
+
+    td code, p code, li code {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px;
+      background: rgba(99, 102, 241, 0.08);
+      color: var(--brand-dark);
+      padding: 2px 7px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    td.cmd { width: 45%; }
+
+    /* Subsection */
+    .sub-head {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.18em;
+      color: var(--ink-500); text-transform: uppercase;
+      margin: 24px 0 10px;
+    }
+
+    /* Callout */
+    .callout {
+      padding: 16px 18px; border-radius: 14px; font-size: 14px;
+      line-height: 1.55; margin: 16px 0;
+      border-left: 4px solid var(--gold);
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(249, 115, 22, 0.05));
+      color: var(--ink-700);
+    }
+    .callout strong { color: var(--ink-900); }
+
+    /* Workflow block */
+    .wf-head {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 16px; font-weight: 600; color: var(--ink-900);
+      margin: 16px 0 8px;
+    }
+    pre {
+      background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%);
+      color: #E0E7FF;
+      padding: 18px 22px;
+      border-radius: 14px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px; line-height: 1.65;
+      box-shadow: 0 8px 24px -8px rgba(30, 27, 75, 0.35);
+    }
+    pre .comment { color: #94A3B8; font-style: italic; }
+
+    /* Footer */
+    footer {
+      margin-top: 60px;
+      padding-top: 24px; border-top: 1px solid var(--surface-200);
+      font-size: 13px; color: var(--ink-500);
+    }
+    footer a { color: var(--brand); text-decoration: none; font-weight: 600; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">WealthSignal · Decision Engine</div>
+    <h1>NPM Commands Reference</h1>
+    <p>Every orchestration command in this repo lives in the root <code style="background:rgba(255,255,255,0.15);color:white;">package.json</code>. This guide groups them by <strong>when</strong> you use them so a new contributor can get productive in minutes.</p>
+    <div class="muted">⚠ Activation has to run in your own shell — <code style="background:rgba(255,255,255,0.15);color:white;">npm</code> can't modify the parent shell's PATH. Whenever a command begins with <code style="background:rgba(255,255,255,0.15);color:white;">source …</code>, copy-paste and run it yourself.</div>
+  </div>
+
+  <!-- ═══ First time ══════════════════════════════════════════════ -->
+  <section id="first-time">
+    <div class="sec-head">
+      <div class="sec-badge" style="background: linear-gradient(135deg, #4F46E5, #7C3AED);">🆕</div>
+      <div>
+        <h2>First-time setup</h2>
+        <div class="sub">Run once per machine.</div>
+      </div>
+    </div>
+
+    <p style="margin:0 0 16px; color: var(--ink-700); line-height:1.6;">
+      One command bootstraps everything: conda env, package scaffold, Python deps,
+      portal deps, pre-commit hooks, and a next-step cheat-sheet banner.
+    </p>
+
+    <div class="card">
+      <table>
+        <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td class="cmd"><code>npm run setup:local:all</code></td><td><strong>Full bootstrap.</strong> Chains all the steps below in order.</td></tr>
+          <tr><td class="cmd"><code>npm run setup:local:conda</code></td><td>Creates (or updates) the conda env at <code>$HOME/runtime_data/python_venvs/WealthSignal-Decision-Engine</code>. Idempotent.</td></tr>
+          <tr><td class="cmd"><code>npm run setup:local:scaffold</code></td><td>Creates <code>engine/wealthsignal/{config,data,models,training,serving,utils,tracking}/__init__.py</code>. Never overwrites.</td></tr>
+          <tr><td class="cmd"><code>npm run setup:local:python</code></td><td><code>pip install -e .[dev,db,seed]</code> inside the conda env.</td></tr>
+          <tr><td class="cmd"><code>npm run setup:local:portals</code></td><td>Installs npm workspace dependencies for <code>admin_portal</code> + <code>customer_portal</code>.</td></tr>
+          <tr><td class="cmd"><code>npm run setup:local:precommit</code></td><td>Wires <code>pre-commit</code> hooks for ruff + black.</td></tr>
+          <tr><td class="cmd"><code>npm run setup:local:airflow</code></td><td>Runs the Airflow DB migration + admin-user bootstrap (needs Postgres up).</td></tr>
+          <tr><td class="cmd"><code>npm run setup:local:post</code></td><td>Prints the final banner with next-step commands.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout"><strong>Immediately after setup:</strong>
+      <pre style="margin-top:10px;"><span class="comment"># Activate the conda env in THIS shell:</span>
+source DevOps/Local/python/activate.sh</pre>
+    </div>
+  </section>
+
+  <!-- ═══ Daily ══════════════════════════════════════════════ -->
+  <section id="daily">
+    <div class="sec-head">
+      <div class="sec-badge" style="background: linear-gradient(135deg, #10B981, #06B6D4);">🔄</div>
+      <div>
+        <h2>Daily driver commands</h2>
+        <div class="sub">Things you run every session.</div>
+      </div>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td class="cmd"><code>source DevOps/Local/python/activate.sh</code></td><td>Activate the project's conda env (must be sourced, not run).</td></tr>
+          <tr><td class="cmd"><code>source DevOps/Local/python/deactivate.sh</code></td><td>Deactivate when done.</td></tr>
+          <tr><td class="cmd"><code>npm run env:activate</code></td><td>Prints the source command above (useful if you forget the path).</td></tr>
+          <tr><td class="cmd"><code>npm run env:deactivate</code></td><td>Prints the deactivation command.</td></tr>
+          <tr><td class="cmd"><code>npm run run:local:all</code></td><td>Bring up the full stack — Docker infra → middleware → portals.</td></tr>
+          <tr><td class="cmd"><code>npm run run:local:status</code></td><td>One-line health per service across every tier.</td></tr>
+          <tr><td class="cmd"><code>npm run run:local:shutdown</code></td><td>Reverse-order tear-down — portals → middleware → Docker.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══ Ad-hoc ══════════════════════════════════════════════ -->
+  <section id="adhoc">
+    <div class="sec-head">
+      <div class="sec-badge" style="background: linear-gradient(135deg, #F59E0B, #F97316);">🧪</div>
+      <div>
+        <h2>Ad-hoc commands</h2>
+        <div class="sub">Individual tier controls + one-off tasks.</div>
+      </div>
+    </div>
+
+    <div class="sub-head">Docker infrastructure</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Command</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td><code>npm run run:local:docker:all</code></td><td>All infra containers in order (network → Postgres → Kafka → Airflow → Observability → MLflow).</td></tr>
+          <tr><td><code>npm run run:local:docker:status</code></td><td>Per-container state + port mapping.</td></tr>
+          <tr><td><code>npm run run:local:docker:shutdown</code></td><td>Stop every infra container.</td></tr>
+          <tr><td><code>npm run run:local:docker:airflow</code></td><td>Airflow scheduler + webserver + triggerer only.</td></tr>
+          <tr><td><code>npm run run:local:docker:postgres</code></td><td>Shared Postgres only.</td></tr>
+          <tr><td><code>npm run run:local:docker:kafka</code></td><td>Kafka + Kafka UI only.</td></tr>
+          <tr><td><code>npm run run:local:docker:observability</code></td><td>Prometheus + Grafana + Elasticsearch + Kibana.</td></tr>
+          <tr><td><code>npm run run:local:docker:mlflow</code></td><td>MLflow tracking server only.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-head">Middleware (FastAPI — ports 8001–8004)</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Command</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td><code>npm run run:local:middleware:all</code></td><td>All four APIs in background (logs in <code>.local/logs/</code>).</td></tr>
+          <tr><td><code>npm run run:local:middleware:status</code></td><td>Per-API <code>/health</code> probe.</td></tr>
+          <tr><td><code>npm run run:local:middleware:shutdown</code></td><td>Stop all four APIs.</td></tr>
+          <tr><td><code>npm run run:local:middleware:admin</code></td><td><code>admin_api</code> foreground on <code>:8001</code>.</td></tr>
+          <tr><td><code>npm run run:local:middleware:customer</code></td><td><code>customer_api</code> foreground on <code>:8002</code>.</td></tr>
+          <tr><td><code>npm run run:local:middleware:data-management</code></td><td><code>data_management_api</code> foreground on <code>:8003</code>.</td></tr>
+          <tr><td><code>npm run run:local:middleware:product-catalog</code></td><td><code>product_catalog_api</code> foreground on <code>:8004</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-head">Portals (Angular — ports 4201–4202)</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Command</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td><code>npm run run:local:portals:all</code></td><td>Both portals in background.</td></tr>
+          <tr><td><code>npm run run:local:portals:status</code></td><td>Port + HTTP probe per portal.</td></tr>
+          <tr><td><code>npm run run:local:portals:shutdown</code></td><td>Stop both portals.</td></tr>
+          <tr><td><code>npm run run:local:portals:admin</code></td><td><code>admin_portal</code> foreground on <code>:4201</code>.</td></tr>
+          <tr><td><code>npm run run:local:portals:customer</code></td><td><code>customer_portal</code> foreground on <code>:4202</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-head">Data ops</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Command</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td><code>npm run seed:products</code></td><td>Regenerates <code>data/product_catalog/products_seed.json</code> (10,000 products).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-head">Quality & tests</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Command</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td><code>npm run lint:python</code></td><td><code>ruff check .</code> + <code>black --check .</code>.</td></tr>
+          <tr><td><code>npm run lint:portals</code></td><td>Angular lint across workspaces.</td></tr>
+          <tr><td><code>npm run lint:all</code></td><td>Both of the above.</td></tr>
+          <tr><td><code>npm run format:python</code></td><td>Auto-fix: <code>ruff --fix</code> + <code>black</code>.</td></tr>
+          <tr><td><code>npm run test:python</code></td><td>Pytest over <code>engine/</code> + <code>middleware/</code> (excluding DAG tests).</td></tr>
+          <tr><td><code>npm run test:portals</code></td><td>Jest tests across portal workspaces.</td></tr>
+          <tr><td><code>npm run test:airflow</code></td><td>Pytest on <code>tests/airflow/</code>.</td></tr>
+          <tr><td><code>npm run test:all</code></td><td>All three test suites in sequence.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-head">Build & env management</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Command</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td><code>npm run build:portals</code></td><td>Production Angular builds (both portals).</td></tr>
+          <tr><td><code>npm run env:path</code></td><td>Prints the conda-env prefix path.</td></tr>
+          <tr><td><code>npm run env:remove</code></td><td>Delete the conda env entirely.</td></tr>
+          <tr><td><code>npm run env:recreate</code></td><td>Remove + recreate + pip-install in one shot.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══ Workflows ══════════════════════════════════════════════ -->
+  <section id="workflows">
+    <div class="sec-head">
+      <div class="sec-badge" style="background: linear-gradient(135deg, #0EA5E9, #10B981);">🛠</div>
+      <div>
+        <h2>Typical workflows</h2>
+        <div class="sub">Copy-paste recipes for common situations.</div>
+      </div>
+    </div>
+
+    <div class="wf-head">Brand-new machine</div>
+<pre>git clone git&#64;github.com:javakishore-veleti/WealthSignal-Decision-Engine.git
+cd WealthSignal-Decision-Engine
+
+npm run setup:local:all                   <span class="comment"># full bootstrap (~5-10 min)</span>
+source DevOps/Local/python/activate.sh    <span class="comment"># activate in this shell</span>
+npm run run:local:all                     <span class="comment"># start every tier</span></pre>
+
+    <div class="wf-head">Starting a working session</div>
+<pre>source DevOps/Local/python/activate.sh
+npm run run:local:all
+<span class="comment"># … work …</span>
+npm run run:local:shutdown
+source DevOps/Local/python/deactivate.sh</pre>
+
+    <div class="wf-head">Iterating on a single middleware service</div>
+<pre>npm run run:local:docker:postgres             <span class="comment"># only what the service needs</span>
+npm run run:local:middleware:product-catalog  <span class="comment"># foreground reload on file change</span></pre>
+
+    <div class="wf-head">Resetting a broken env</div>
+<pre>npm run env:recreate                          <span class="comment"># remove + recreate + pip-install</span></pre>
+  </section>
+
+  <footer>
+    <p>
+      <strong>Pointers:</strong> root <code>package.json</code> is operational only (no runtime JS).
+      Angular portals live under <code>portals/</code> as npm workspaces.
+      Conda prefix overridable via <code>$WEALTHSIGNAL_CONDA_PREFIX</code>.
+      PIDs + logs for background processes live under <code>.local/</code> (gitignored).
+      DB migrations are Alembic, triggered manually via the <code>Database Migration</code> GitHub Actions workflow.
+    </p>
+    <p>
+      Related docs:
+      <a href="README.md">README.md</a> ·
+      <a href="CONTRIBUTING.md">CONTRIBUTING.md</a> ·
+      <a href="db/README.md">db/README.md</a>
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>
