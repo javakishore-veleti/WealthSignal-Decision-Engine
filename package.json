@@ -27,6 +27,7 @@
     "setup:local:portals": "npm install",
     "setup:local:precommit": "conda run --prefix \"$HOME/runtime_data/python_venvs/WealthSignal-Decision-Engine\" pre-commit install",
     "setup:local:airflow": "bash DevOps/Local/airflow/init.sh",
+    "reset:airflow": "bash DevOps/Local/airflow/reset.sh",
     "setup:local:dvc": "bash DevOps/Local/python/dvc-init.sh",
     "setup:local:mlflow:experiments": "mkdir -p .local/logs && curl -sS -X POST http://localhost:8001/api/v1/mlflow/bootstrap-experiments | tee .local/logs/mlflow-bootstrap.json",
     "setup:local:post": "bash DevOps/Local/python/post-setup.sh",
