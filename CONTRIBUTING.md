@@ -11,7 +11,7 @@ middleware/              # FastAPI microservices (each is independently deployab
 └── data_management_api/ # Async orchestration → submits jobs to Airflow
                          # (ingestion, downloads, PyTorch training runs)
 
-portals/                 # User-facing front-ends
+portals/                 # Angular 17 front-ends (managed as npm workspaces)
 ├── admin_portal/        # Internal operations console (consumes admin_api)
 └── customer_portal/     # Customer digital form UI (consumes customer_api)
 
@@ -163,6 +163,27 @@ pytest tests/ -v --cov=engine --cov=middleware
 - Each service ships a `Dockerfile` and a `docker-compose.yml` fragment for local dev.
 - API versioning via URL prefix: `/api/v1/...`.
 - `data_management_api` is **non-blocking** — every heavy operation returns a `job_id` immediately and defers execution to Airflow. No PyTorch training or data download happens inside the API process.
+
+## Angular portal conventions
+
+- Both portals are **Angular 17** standalone-component apps managed via **npm workspaces** rooted at the repo's `package.json`.
+- TypeScript strict mode is non-negotiable (`"strict": true` in `tsconfig.json`).
+- State management via **NgRx** (signals-based) for admin_portal; **signals + services** for customer_portal (lighter-weight).
+- Styling with **Angular Material** + a shared design-tokens SCSS file under `portals/shared/` (created when the second portal is scaffolded).
+- API clients are generated from the FastAPI OpenAPI specs (`npm run generate:api-clients` — target task once APIs stabilise) and live under `src/app/api/`.
+- E2E tests use **Playwright**; unit tests use **Jest**.
+- Portals never call `engine/wealthsignal` directly — they always go through the middleware APIs.
+
+Useful root-level commands:
+
+```bash
+npm run portals:install   # npm install across all portal workspaces
+npm run dev:admin         # run admin_portal in dev mode
+npm run dev:customer      # run customer_portal in dev mode
+npm run portals:build     # production builds for both portals
+npm run portals:lint
+npm run portals:test
+```
 
 ## Airflow DAG conventions
 

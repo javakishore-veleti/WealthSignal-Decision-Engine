@@ -21,6 +21,12 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 
+**Portals**
+[![Angular](https://img.shields.io/badge/Angular-17-DD0031?logo=angular&logoColor=white)](https://angular.io/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![npm workspaces](https://img.shields.io/badge/npm-workspaces-CB3837?logo=npm&logoColor=white)](https://docs.npmjs.com/cli/v10/using-npm/workspaces)
+
 **Observability**
 [![Grafana](https://img.shields.io/badge/Grafana-dashboards-F46800?logo=grafana&logoColor=white)](https://grafana.com/)
 [![Prometheus](https://img.shields.io/badge/Prometheus-metrics-E6522C?logo=prometheus&logoColor=white)](https://prometheus.io/)
@@ -144,10 +150,27 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full conventions — branch namin
 ### Quick local start
 
 ```bash
+# Bring up all infrastructure (Airflow, Postgres, Kafka, observability)
+npm run docker:up
+# or directly:
 ./DevOps/Local/docker-all-up.sh
+
+# Endpoints
 # Airflow: http://localhost:8080   MLflow: http://localhost:5000
 # Grafana: http://localhost:3000   Kibana: http://localhost:5601
+
+# FastAPI services (each on its own port)
+npm run api:admin          # admin_api           → localhost:8001
+npm run api:customer       # customer_api        → localhost:8002
+npm run api:data-management # data_management_api → localhost:8003
+
+# Angular portals (npm workspaces)
+npm run portals:install
+npm run dev:admin          # admin_portal
+npm run dev:customer       # customer_portal
 ```
+
+> The root `package.json` is **operational only** — it orchestrates Docker, FastAPI services, and Angular workspaces. No runtime JavaScript lives at the repo root.
 
 ## Research anchor
 
