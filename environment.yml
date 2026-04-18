@@ -1,0 +1,22 @@
+# Declarative conda environment for WealthSignal-Decision-Engine.
+#
+# The `name:` field is a convenience label — the env is materialised at the
+# prefix path declared in package.json (`$HOME/runtime_data/python_venvs/
+# WealthSignal-Decision-Engine`) so it lives outside the conda system's
+# default envs folder, next to the user's other project venvs.
+#
+# Heavy runtime libraries (torch, transformers, etc.) are NOT listed here —
+# they ship via pyproject.toml extras installed after the env is created.
+# Keep this file minimal so recreating the env stays fast.
+
+name: wealthsignal-decision-engine
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.11
+  - pip>=24.0
+  - pip:
+      - -e ".[dev,db,seed]"
