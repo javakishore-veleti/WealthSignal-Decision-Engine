@@ -80,11 +80,33 @@ DEFAULT_ARGS = {
 def bootstrap_mlflow_experiments() -> None:
     @task(task_id="ensure_experiments")
     def ensure_experiments() -> dict:
+        import urllib.error
+        import urllib.request
+
         import mlflow  # imported inside task so DAG parse doesn't need mlflow
 
         uri = os.environ.get("MLFLOW_TRACKING_URI", "http://ws-mlflow:5000")
+
+        # Pre-flight: fail fast if MLflow isn't reachable (don't hang 2+ minutes
+        # on MLflow's default 120-s retry loop).
+        try:
+            with urllib.request.urlopen(f"{uri}/health", timeout=5) as resp:
+                if resp.status >= 400:
+                    raise RuntimeError(f"MLflow health probe returned HTTP {resp.status}")
+            log.info("MLflow health probe ok — proceeding")
+        except (urllib.error.URLError, TimeoutError) as exc:
+            raise RuntimeError(
+                f"MLflow at {uri} is unreachable: {type(exc).__name__}: {exc}. "
+                "Check `docker logs ws-mlflow` and confirm the container is healthy."
+            ) from exc
+
         mlflow.set_tracking_uri(uri)
         log.info("Using MLflow tracking URI: %s", uri)
+
+        # Explicit short timeout on every subsequent HTTP call — MLflow default
+        # is 120 s which makes a wedged network look like a hung DAG.
+        os.environ.setdefault("MLFLOW_HTTP_REQUEST_TIMEOUT", "10")
+        os.environ.setdefault("MLFLOW_HTTP_REQUEST_MAX_RETRIES", "2")
 
         client = mlflow.MlflowClient(tracking_uri=uri)
 
