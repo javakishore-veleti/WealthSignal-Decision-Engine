@@ -43,7 +43,8 @@
     "//1": "─── RUN · DOCKER: local infrastructure containers ─────────────",
     "run:local:docker:all": "bash DevOps/Local/docker-all-up.sh",
     "run:local:docker:status": "bash DevOps/Local/docker-all-status.sh",
-    "run:local:docker:shutdown": "bash DevOps/Local/docker-all-down.sh",
+    "run:local:docker:shutdown": "bash DevOps/Local/docker-all-down.sh --volumes",
+    "run:local:docker:shutdown:keep-data": "bash DevOps/Local/docker-all-down.sh",
     "run:local:docker:airflow": "docker compose -f DevOps/Local/airflow/docker-compose.yml up -d",
     "run:local:docker:postgres": "docker compose -f DevOps/Local/postgres/docker-compose.yml up -d",
     "run:local:docker:kafka": "docker compose -f DevOps/Local/kafka/docker-compose.yml up -d",
@@ -72,6 +73,7 @@
     "run:local:all": "npm-run-all -s run:local:docker:all run:local:middleware:all run:local:portals:all",
     "run:local:status": "npm-run-all -s run:local:docker:status run:local:middleware:status run:local:portals:status",
     "run:local:shutdown": "npm-run-all -s run:local:portals:shutdown run:local:middleware:shutdown run:local:docker:shutdown",
+    "run:local:shutdown:keep-data": "npm-run-all -s run:local:portals:shutdown run:local:middleware:shutdown run:local:docker:shutdown:keep-data",
 
     "//5": "─── BUILD · portals (production artefacts) ───────────────────",
     "build:portals": "npm run build --workspaces --if-present",
