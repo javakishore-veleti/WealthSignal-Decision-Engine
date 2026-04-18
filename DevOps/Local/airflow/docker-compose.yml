@@ -19,8 +19,11 @@ x-airflow-common: &airflow-common
     # (Airflow's default 'paused at creation' makes `POST /dagRuns` return
     # 200 but the scheduler ignores it — silent failure we just hit).
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://wealthsignal:wealthsignal@postgres:5432/wealthsignal
-    AIRFLOW__CORE__SQL_ALCHEMY_SCHEMA: airflow
+    # Airflow owns a dedicated database (`airflow`) on the shared Postgres
+    # instance — NOT a shared DB + dedicated schema. AIRFLOW__CORE__SQL_ALCHEMY_SCHEMA
+    # is deprecated in 2.9 and, in practice, breaks `_reserialize_dags`
+    # during db migrate ("relation airflow.serialized_dag does not exist").
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://wealthsignal:wealthsignal@postgres:5432/airflow
     AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "false"
     AIRFLOW__WEBSERVER__SECRET_KEY: "${AIRFLOW_SECRET_KEY:-local-development-secret}"
