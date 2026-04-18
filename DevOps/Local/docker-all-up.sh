@@ -19,6 +19,12 @@ echo "▶ Starting Kafka (event bus)..."
 docker compose -f kafka/docker-compose.yml up -d
 
 echo "▶ Starting Airflow (scheduler, webserver, triggerer)..."
+# Build the custom Airflow image on first boot (idempotent — Docker's layer
+# cache makes subsequent runs ~instant once all deps are baked in).
+if ! docker image inspect wealthsignal/airflow:2.9.3 >/dev/null 2>&1; then
+  echo "  (first boot — building wealthsignal/airflow:2.9.3 image, ~2-3 min)"
+  docker compose -f airflow/docker-compose.yml build
+fi
 docker compose -f airflow/docker-compose.yml up -d
 
 echo "▶ Starting Observability (Prometheus + Grafana + Elasticsearch + Kibana)..."

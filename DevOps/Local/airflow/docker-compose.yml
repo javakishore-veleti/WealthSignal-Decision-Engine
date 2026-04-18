@@ -5,7 +5,13 @@
 name: wealthsignal-airflow
 
 x-airflow-common: &airflow-common
-  image: apache/airflow:2.9.3-python3.11
+  # Custom image — see DevOps/Local/airflow/Dockerfile. Baked-in deps make
+  # container start time ~seconds instead of the 10-30 minutes that
+  # _PIP_ADDITIONAL_REQUIREMENTS used to force on every boot.
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: wealthsignal/airflow:2.9.3
   environment:
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
@@ -16,8 +22,6 @@ x-airflow-common: &airflow-common
     AIRFLOW__WEBSERVER__SECRET_KEY: "${AIRFLOW_SECRET_KEY:-local-development-secret}"
     AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth"
     PYTHONPATH: /opt/airflow/dags:/opt/airflow/plugins:/opt/airflow/engine
-    # Engine package mounted into the container so DAGs can `import engine.wealthsignal`.
-    _PIP_ADDITIONAL_REQUIREMENTS: "mlflow==2.13.* torch==2.3.* great-expectations==0.18.* apache-airflow-providers-postgres==5.11.*"
     # Pre-configured connection used by dags/ingestion/load_product_catalog.py.
     AIRFLOW_CONN_WEALTHSIGNAL_POSTGRES: "postgresql+psycopg2://wealthsignal:wealthsignal@postgres:5432/wealthsignal"
 
