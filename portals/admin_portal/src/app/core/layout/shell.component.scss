@@ -1,0 +1,16 @@
+/* Shell-scoped styles — almost everything is utility-class-driven,
+   but some subtle touches sit here to keep the template readable. */
+
+:host {
+  display: block;
+}
+
+/* Smooth fade when route content changes. */
+main {
+  animation: fade-in 300ms ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
