@@ -44,13 +44,16 @@ services:
       - ws-kafka-data:/tmp/kraft-combined-logs
 
     healthcheck:
+      # kafka-broker-api-versions.sh is a lighter probe than kafka-topics.sh
+      # (no metadata lookup). start_period is 90 s to cover first-time log
+      # directory formatting + controller election on slower machines.
       test:
         - CMD-SHELL
-        - "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1 || exit 1"
-      interval: 15s
+        - "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1 || exit 1"
+      interval: 10s
       timeout: 10s
-      retries: 10
-      start_period: 30s
+      retries: 30
+      start_period: 90s
 
     networks:
       - wealthsignal-net
@@ -66,7 +69,9 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
     depends_on:
       kafka:
-        condition: service_healthy
+        # Don't block on Kafka being 'healthy' — if Kafka is slow to start,
+        # kafka-ui will reconnect automatically once the broker is up.
+        condition: service_started
     networks:
       - wealthsignal-net
 
