@@ -41,7 +41,8 @@ Things you run every session.
 | `source DevOps/Local/python/deactivate.sh` | Deactivate when done. |
 | `npm run env:activate` | Prints the source command above (useful if you forget the path). |
 | `npm run env:deactivate` | Prints the deactivation command. |
-| `npm run run:local:all` | Bring up the full stack — Docker infra → middleware → portals. |
+| `npm run run:local:all` | **Auto-syncs Python deps** (`pip install -e ".[dev,db,seed]"`, idempotent), then brings up the full stack — Docker infra → middleware → portals → local-links page. |
+| `npm run run:local:sync-deps` | Re-install Python deps inside the conda env without starting anything. Idempotent. Runs automatically as the first step of `run:local:all`. |
 | `npm run run:local:status` | One-line health per service across every tier. |
 | `npm run run:local:shutdown` | Reverse-order tear-down — portals → middleware → Docker. |
 
