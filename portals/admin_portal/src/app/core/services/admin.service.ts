@@ -20,6 +20,17 @@ export class AdminService {
     );
   }
 
+  /**
+   * Triggers the bootstrap_mlflow_experiments Airflow DAG via admin_api.
+   * Idempotent — the DAG detects existing experiments and refreshes their tags only.
+   */
+  triggerMlflowBootstrap(): Observable<JobResponse> {
+    return this.http.post<JobResponse>(
+      `${this.base}/mlflow/bootstrap-experiments`,
+      {},
+    );
+  }
+
   pollJob(jobId: string): Observable<JobResponse> {
     return this.http.get<JobResponse>(`${this.base}/jobs/${encodeURIComponent(jobId)}`);
   }

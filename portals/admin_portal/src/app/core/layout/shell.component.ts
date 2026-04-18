@@ -1,11 +1,20 @@
-import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { NgClass } from "@angular/common";
-import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
+import {
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from "@angular/router";
+import { filter, map, startWith } from "rxjs/operators";
+import { toSignal } from "@angular/core/rxjs-interop";
+
+type TopSection = "dashboard" | "domain-services" | "administration";
 
 /**
  * Top-level application shell — top nav, left side nav, main content.
- * The whole design language lives in the template: vibrant brand
- * gradient for the top bar, soft white side rail, bright content canvas.
+ * The left rail switches contents based on the active top-nav section.
  */
 @Component({
   selector: "ws-shell",
@@ -24,7 +33,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
           <a routerLink="/dashboard" class="flex items-center gap-3 pr-6 border-r border-white/20">
             <div class="h-10 w-10 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center
                         ring-1 ring-white/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.4)]">
-              <!-- Monogram -->
               <svg viewBox="0 0 24 24" fill="none" class="h-6 w-6 text-white">
                 <path d="M4 14.5L8 6l4 8.5L16 6l4 8.5" stroke="currentColor" stroke-width="2.4"
                       stroke-linecap="round" stroke-linejoin="round"/>
@@ -42,8 +50,9 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
             <a routerLink="/dashboard" routerLinkActive="active" class="ws-topnav-link">Dashboard</a>
             <a routerLink="/domain-services/product-catalog" routerLinkActive="active"
                class="ws-topnav-link">Domain Services</a>
+            <a routerLink="/administration/system-settings/mlflow-experiments"
+               routerLinkActive="active" class="ws-topnav-link">Administration</a>
             <a class="ws-topnav-link opacity-60 cursor-not-allowed">Compliance</a>
-            <a class="ws-topnav-link opacity-60 cursor-not-allowed">Settings</a>
           </nav>
 
           <div class="flex-1"></div>
@@ -55,7 +64,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
             LOCAL &middot; {{ now() }}
           </div>
 
-          <!-- User chip -->
           <button class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10
                          hover:bg-white/20 transition-colors duration-200">
             <div class="h-8 w-8 rounded-full bg-gradient-to-br from-gold-400 to-coral-500
@@ -71,74 +79,137 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
       <!-- ─── Body: side nav + content ──────────────────────────────── -->
       <div class="flex-1 flex max-w-[1600px] w-full mx-auto">
         <aside class="hidden lg:flex w-72 shrink-0 p-6 flex-col gap-6">
-          <div>
-            <div class="uppercase text-[11px] tracking-[0.22em] font-bold text-ink-500 mb-3 px-2">
-              Domain Services
+
+          <!-- ── Domain Services rail ────────────────────────────── -->
+          @if (topSection() === "domain-services") {
+            <div>
+              <div class="uppercase text-[11px] tracking-[0.22em] font-bold text-ink-500 mb-3 px-2">
+                Domain Services
+              </div>
+              <nav class="flex flex-col gap-1">
+                <!-- Product Catalog group -->
+                <button
+                  (click)="toggleGroup('product-catalog')"
+                  [ngClass]="{ 'active': group() === 'product-catalog' }"
+                  class="ws-side-link w-full justify-between">
+                  <span class="flex items-center gap-3">
+                    <span class="h-8 w-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500
+                                 flex items-center justify-center text-white text-xs font-bold">PC</span>
+                    <span>Product Catalog</span>
+                  </span>
+                  <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 transition-transform duration-250"
+                       [ngClass]="{ 'rotate-90': group() === 'product-catalog' }">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                      d="M6.7 4.7a1 1 0 011.4 0l4.6 4.6a1 1 0 010 1.4l-4.6 4.6a1 1 0 01-1.4-1.4L10.5 10 6.7 6.1a1 1 0 010-1.4z"/>
+                  </svg>
+                </button>
+
+                @if (group() === "product-catalog") {
+                  <div class="flex flex-col gap-1 mt-1">
+                    <a routerLink="/domain-services/product-catalog"
+                       [routerLinkActiveOptions]="{ exact: true }"
+                       routerLinkActive="active" class="ws-side-sub">
+                      <span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>
+                      View All
+                    </a>
+                    <a routerLink="/domain-services/product-catalog/create"
+                       routerLinkActive="active" class="ws-side-sub">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                      Create
+                    </a>
+                    <a routerLink="/domain-services/product-catalog/search"
+                       routerLinkActive="active" class="ws-side-sub">
+                      <span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>
+                      Search
+                    </a>
+                    <a routerLink="/domain-services/product-catalog/initial-load"
+                       routerLinkActive="active" class="ws-side-sub">
+                      <span class="h-1.5 w-1.5 rounded-full bg-gold-500"></span>
+                      Initial Data Load Setup
+                    </a>
+                  </div>
+                }
+
+                <button class="ws-side-link opacity-60 cursor-not-allowed mt-2">
+                  <span class="h-8 w-8 rounded-lg bg-gradient-to-br from-coral-500 to-rose-500
+                               flex items-center justify-center text-white text-xs font-bold">MR</span>
+                  <span>Model Registry</span>
+                </button>
+                <button class="ws-side-link opacity-60 cursor-not-allowed">
+                  <span class="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-accent-500
+                               flex items-center justify-center text-white text-xs font-bold">CS</span>
+                  <span>Customer Segments</span>
+                </button>
+                <button class="ws-side-link opacity-60 cursor-not-allowed">
+                  <span class="h-8 w-8 rounded-lg bg-gradient-to-br from-gold-500 to-coral-500
+                               flex items-center justify-center text-white text-xs font-bold">CM</span>
+                  <span>Campaigns</span>
+                </button>
+              </nav>
             </div>
-            <nav class="flex flex-col gap-1">
-              <!-- Product Catalog group -->
-              <button
-                (click)="toggleGroup('product-catalog')"
-                [ngClass]="{ 'active': group() === 'product-catalog' }"
-                class="ws-side-link w-full justify-between">
-                <span class="flex items-center gap-3">
+          }
+
+          <!-- ── Administration rail ────────────────────────────── -->
+          @if (topSection() === "administration") {
+            <div>
+              <div class="uppercase text-[11px] tracking-[0.22em] font-bold text-ink-500 mb-3 px-2">
+                Administration
+              </div>
+              <nav class="flex flex-col gap-1">
+                <!-- System Settings group -->
+                <button
+                  (click)="toggleGroup('system-settings')"
+                  [ngClass]="{ 'active': group() === 'system-settings' }"
+                  class="ws-side-link w-full justify-between">
+                  <span class="flex items-center gap-3">
+                    <span class="h-8 w-8 rounded-lg bg-gradient-to-br from-gold-500 to-coral-500
+                                 flex items-center justify-center text-white text-xs font-bold">SS</span>
+                    <span>System Settings</span>
+                  </span>
+                  <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 transition-transform duration-250"
+                       [ngClass]="{ 'rotate-90': group() === 'system-settings' }">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                      d="M6.7 4.7a1 1 0 011.4 0l4.6 4.6a1 1 0 010 1.4l-4.6 4.6a1 1 0 01-1.4-1.4L10.5 10 6.7 6.1a1 1 0 010-1.4z"/>
+                  </svg>
+                </button>
+
+                @if (group() === "system-settings") {
+                  <div class="flex flex-col gap-1 mt-1">
+                    <a routerLink="/administration/system-settings/mlflow-experiments"
+                       routerLinkActive="active" class="ws-side-sub">
+                      <span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>
+                      MLflow Experiments
+                    </a>
+                    <a class="ws-side-sub opacity-60 cursor-not-allowed">
+                      <span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>
+                      Airflow Connections
+                    </a>
+                    <a class="ws-side-sub opacity-60 cursor-not-allowed">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                      Database Migrations
+                    </a>
+                    <a class="ws-side-sub opacity-60 cursor-not-allowed">
+                      <span class="h-1.5 w-1.5 rounded-full bg-gold-500"></span>
+                      Health Checks
+                    </a>
+                  </div>
+                }
+
+                <button class="ws-side-link opacity-60 cursor-not-allowed mt-2">
                   <span class="h-8 w-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500
-                               flex items-center justify-center text-white text-xs font-bold">PC</span>
-                  <span>Product Catalog</span>
-                </span>
-                <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 transition-transform duration-250"
-                     [ngClass]="{ 'rotate-90': group() === 'product-catalog' }">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M6.7 4.7a1 1 0 011.4 0l4.6 4.6a1 1 0 010 1.4l-4.6 4.6a1 1 0 01-1.4-1.4L10.5 10 6.7 6.1a1 1 0 010-1.4z"/>
-                </svg>
-              </button>
+                               flex items-center justify-center text-white text-xs font-bold">UM</span>
+                  <span>User Management</span>
+                </button>
+                <button class="ws-side-link opacity-60 cursor-not-allowed">
+                  <span class="h-8 w-8 rounded-lg bg-gradient-to-br from-coral-500 to-rose-500
+                               flex items-center justify-center text-white text-xs font-bold">AL</span>
+                  <span>Audit Log</span>
+                </button>
+              </nav>
+            </div>
+          }
 
-              @if (group() === "product-catalog") {
-                <div class="flex flex-col gap-1 mt-1">
-                  <a routerLink="/domain-services/product-catalog"
-                     [routerLinkActiveOptions]="{ exact: true }"
-                     routerLinkActive="active" class="ws-side-sub">
-                    <span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>
-                    View All
-                  </a>
-                  <a routerLink="/domain-services/product-catalog/create"
-                     routerLinkActive="active" class="ws-side-sub">
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                    Create
-                  </a>
-                  <a routerLink="/domain-services/product-catalog/search"
-                     routerLinkActive="active" class="ws-side-sub">
-                    <span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>
-                    Search
-                  </a>
-                  <a routerLink="/domain-services/product-catalog/initial-load"
-                     routerLinkActive="active" class="ws-side-sub">
-                    <span class="h-1.5 w-1.5 rounded-full bg-gold-500"></span>
-                    Initial Data Load Setup
-                  </a>
-                </div>
-              }
-
-              <!-- Placeholder for future groups -->
-              <button class="ws-side-link opacity-60 cursor-not-allowed mt-2">
-                <span class="h-8 w-8 rounded-lg bg-gradient-to-br from-coral-500 to-rose-500
-                             flex items-center justify-center text-white text-xs font-bold">MR</span>
-                <span>Model Registry</span>
-              </button>
-              <button class="ws-side-link opacity-60 cursor-not-allowed">
-                <span class="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-accent-500
-                             flex items-center justify-center text-white text-xs font-bold">CS</span>
-                <span>Customer Segments</span>
-              </button>
-              <button class="ws-side-link opacity-60 cursor-not-allowed">
-                <span class="h-8 w-8 rounded-lg bg-gradient-to-br from-gold-500 to-coral-500
-                             flex items-center justify-center text-white text-xs font-bold">CM</span>
-                <span>Campaigns</span>
-              </button>
-            </nav>
-          </div>
-
-          <!-- Info card at bottom -->
+          <!-- Info card at bottom (all rails) -->
           <div class="mt-auto ws-card p-5">
             <div class="flex items-center gap-3 mb-3">
               <div class="h-9 w-9 rounded-xl bg-aurora flex items-center justify-center shadow-glow">
@@ -166,12 +237,38 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
   `,
 })
 export class ShellComponent {
+  private readonly router = inject(Router);
+
   readonly group = signal<string>("product-catalog");
   readonly now = signal<string>(
     new Date().toLocaleDateString(undefined, { day: "2-digit", month: "short" }),
   );
 
+  /** Current top-nav section derived from the URL. */
+  readonly topSection = toSignal<TopSection>(
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      startWith(null),
+      map(() => this.resolveTopSection(this.router.url)),
+    ),
+    { initialValue: this.resolveTopSection(this.router.url) },
+  );
+
+  readonly activeGroup = computed(() => {
+    // Auto-expand the group that matches the current top section.
+    const section = this.topSection();
+    if (section === "domain-services" && !this.group()) return "product-catalog";
+    if (section === "administration" && !this.group()) return "system-settings";
+    return this.group();
+  });
+
   toggleGroup(id: string): void {
     this.group.set(this.group() === id ? "" : id);
+  }
+
+  private resolveTopSection(url: string): TopSection {
+    if (url.startsWith("/administration")) return "administration";
+    if (url.startsWith("/domain-services")) return "domain-services";
+    return "dashboard";
   }
 }

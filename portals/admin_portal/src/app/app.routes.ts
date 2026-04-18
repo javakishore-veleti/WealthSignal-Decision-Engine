@@ -18,6 +18,25 @@ export const APP_ROUTES: Routes = [
       },
 
       {
+        path: "administration",
+        children: [
+          {
+            path: "",
+            pathMatch: "full",
+            redirectTo: "system-settings/mlflow-experiments",
+          },
+          {
+            path: "system-settings/mlflow-experiments",
+            loadComponent: () =>
+              import(
+                "./features/administration/mlflow-experiments.component"
+              ).then((m) => m.MlflowExperimentsComponent),
+            title: "Administration · MLflow Experiments",
+          },
+        ],
+      },
+
+      {
         path: "domain-services/product-catalog",
         children: [
           {
