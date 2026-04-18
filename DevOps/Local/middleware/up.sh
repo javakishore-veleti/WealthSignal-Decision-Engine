@@ -17,7 +17,11 @@ start_service() {
   local port="$3"
 
   if lsof -ti:"$port" >/dev/null 2>&1; then
-    echo "  [$name] already running on :$port (PID $(lsof -ti:"$port"))"
+    # uvicorn --reload spawns a reloader + a worker process; both listen on
+    # the same port. Collapse the newline-separated PID list for display.
+    local pids
+    pids=$(lsof -ti:"$port" | paste -sd "," -)
+    echo "  [$name] already running on :$port (PIDs $pids)"
     return 0
   fi
 

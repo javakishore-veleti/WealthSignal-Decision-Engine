@@ -22,12 +22,14 @@ stop_service() {
     rm -f "$pid_file"
   fi
 
-  # Belt-and-braces: also kill whatever is on the port.
-  local port_pid
-  port_pid=$(lsof -ti:"$port" 2>/dev/null || true)
-  if [ -n "$port_pid" ]; then
-    kill "$port_pid" 2>/dev/null || true
-    echo "  [$name] cleaned up port :$port (PID $port_pid)"
+  # Belt-and-braces: also kill whatever else is on the port (uvicorn
+  # --reload spawns multiple listeners; stale PIDs from prior sessions
+  # can linger). `xargs -r` is a no-op when the pipe is empty.
+  if lsof -ti:"$port" >/dev/null 2>&1; then
+    local port_pids
+    port_pids=$(lsof -ti:"$port" | paste -sd "," -)
+    lsof -ti:"$port" | xargs -r kill 2>/dev/null || true
+    echo "  [$name] cleaned up port :$port (PIDs $port_pids)"
   fi
 }
 

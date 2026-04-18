@@ -17,7 +17,11 @@ start_portal() {
   local port="$3"
 
   if lsof -ti:"$port" >/dev/null 2>&1; then
-    echo "  [$name] already running on :$port (PID $(lsof -ti:"$port"))"
+    # `ng serve` spawns Node + watcher children on the same port —
+    # collapse the PID list for display.
+    local pids
+    pids=$(lsof -ti:"$port" | paste -sd "," -)
+    echo "  [$name] already running on :$port (PIDs $pids)"
     return 0
   fi
 
