@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>WealthSignal · Local Links</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --brand:      #4F46E5;
+      --brand-dark: #3730A3;
+      --violet:     #7C3AED;
+      --cyan:       #06B6D4;
+      --emerald:    #10B981;
+      --gold:       #F59E0B;
+      --coral:      #F97316;
+      --rose:       #EF4444;
+      --sky:        #0EA5E9;
+      --ink-900:    #0F172A;
+      --ink-700:    #334155;
+      --ink-500:    #64748B;
+      --ink-300:    #94A3B8;
+      --surface-50: #FAFBFF;
+      --surface-100:#F4F6FB;
+      --surface-200:#E6E9F4;
+      --surface-300:#CDD3E5;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+      color: var(--ink-900);
+      background:
+        radial-gradient(1200px 600px at 0% 0%,   rgba(79, 70, 229, 0.08), transparent 60%),
+        radial-gradient(900px  500px at 100% 0%, rgba(6, 182, 212, 0.08),  transparent 55%),
+        radial-gradient(800px  500px at 50% 100%, rgba(245, 158, 11, 0.05), transparent 60%),
+        var(--surface-50);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 48px 24px 96px; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(120deg, #4F46E5 0%, #7C3AED 45%, #06B6D4 100%);
+      color: white;
+      border-radius: 24px;
+      padding: 44px 40px;
+      box-shadow: 0 24px 60px -20px rgba(79, 70, 229, 0.4);
+      position: relative; overflow: hidden;
+      margin-bottom: 44px;
+    }
+    .hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(400px 200px at 100% 0%, rgba(255,255,255,0.2), transparent 60%),
+        radial-gradient(320px 220px at 0% 100%, rgba(245,158,11,0.25), transparent 60%);
+      pointer-events: none;
+    }
+    .hero .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 4px 12px; border-radius: 999px;
+      background: rgba(255,255,255,0.18); backdrop-filter: blur(8px);
+      font-size: 12px; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; position: relative;
+      margin-bottom: 14px;
+    }
+    .hero .eyebrow::before {
+      content: ""; height: 8px; width: 8px; border-radius: 999px;
+      background: #34D399;
+      box-shadow: 0 0 8px rgba(16,185,129,0.8);
+    }
+    .hero h1 {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700; letter-spacing: -0.02em;
+      margin: 0 0 12px; position: relative;
+    }
+    .hero p { font-size: 17px; line-height: 1.55; max-width: 780px; margin: 0; opacity: 0.92; position: relative; }
+    .hero .note {
+      margin-top: 16px; font-size: 13px; opacity: 0.88;
+      padding: 10px 14px; border-radius: 12px;
+      background: rgba(0,0,0,0.18); display: inline-block; position: relative;
+    }
+
+    /* Section */
+    section { margin-bottom: 40px; }
+
+    .sec-head {
+      display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
+    }
+    .sec-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 44px; width: 44px; border-radius: 14px;
+      color: white; font-size: 20px; font-weight: 700;
+      box-shadow: 0 8px 20px -6px rgba(0,0,0,0.25);
+    }
+    .sec-head h2 {
+      font-family: "Space Grotesk", sans-serif;
+      margin: 0; font-size: 24px; font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .sec-head .sub { font-size: 14px; color: var(--ink-500); margin-top: 2px; }
+
+    /* Grid + cards */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .link-card {
+      background: white;
+      border: 1px solid rgba(230,233,244,0.8);
+      border-radius: 18px;
+      padding: 20px 22px;
+      box-shadow: 0 4px 24px -8px rgba(15,23,42,0.10), 0 2px 8px -2px rgba(99,102,241,0.08);
+      transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+      text-decoration: none; color: inherit; display: block;
+      position: relative; overflow: hidden;
+    }
+    .link-card::after {
+      content: "";
+      position: absolute; top: 0; left: 0; height: 4px; width: 100%;
+      background: var(--accent-gradient, linear-gradient(135deg, #4F46E5, #06B6D4));
+    }
+    .link-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px -8px rgba(79,70,229,0.22), 0 4px 12px -2px rgba(6,182,212,0.12);
+      border-color: rgba(99,102,241,0.3);
+    }
+
+    .card-head {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+    }
+    .card-icon {
+      height: 38px; width: 38px; border-radius: 11px;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 13px;
+      box-shadow: 0 4px 10px -2px rgba(15,23,42,0.18);
+      flex: 0 0 auto;
+    }
+    .card-title {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600; font-size: 16px;
+      color: var(--ink-900);
+    }
+    .card-desc {
+      font-size: 13px; color: var(--ink-500);
+      line-height: 1.5; margin: 0 0 10px;
+    }
+    .card-url {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px; color: var(--brand-dark); font-weight: 600;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .card-url::after {
+      content: "↗";
+      font-size: 14px; opacity: 0.7;
+      transition: transform 200ms ease, opacity 200ms ease;
+    }
+    .link-card:hover .card-url::after { transform: translate(2px, -2px); opacity: 1; }
+    .card-creds {
+      display: inline-block; margin-top: 8px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px; color: var(--ink-500);
+      padding: 2px 8px; border-radius: 999px;
+      background: rgba(99,102,241,0.08);
+    }
+
+    .pill {
+      display: inline-block; margin-left: auto;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.10em;
+      text-transform: uppercase;
+      padding: 3px 8px; border-radius: 999px;
+      background: rgba(16,185,129,0.12); color: var(--emerald);
+    }
+    .pill-warn { background: rgba(245,158,11,0.14); color: #B45309; }
+    .pill-info { background: rgba(6,182,212,0.12); color: #0E7490; }
+
+    /* Action cards (different style — vibrant full-bleed) */
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+    .action-card {
+      border-radius: 20px; padding: 22px 24px;
+      color: white; text-decoration: none; display: block;
+      position: relative; overflow: hidden;
+      box-shadow: 0 10px 24px -8px rgba(79,70,229,0.35);
+      transition: transform 220ms ease, box-shadow 220ms ease;
+    }
+    .action-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px -8px rgba(79,70,229,0.45);
+    }
+    .action-card .label {
+      text-transform: uppercase; letter-spacing: 0.14em;
+      font-size: 11px; font-weight: 700; opacity: 0.85;
+      margin-bottom: 8px;
+    }
+    .action-card .title {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 20px; font-weight: 700; line-height: 1.2;
+      margin-bottom: 4px;
+    }
+    .action-card .desc { font-size: 13px; opacity: 0.92; line-height: 1.5; }
+    .action-card .cta {
+      margin-top: 14px; font-family: "JetBrains Mono", monospace;
+      font-size: 12px; opacity: 0.85;
+    }
+    .action-card::before {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(400px 200px at 100% 0%, rgba(255,255,255,0.18), transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Walkthrough — numbered steps */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .step {
+      background: white;
+      border: 1px solid rgba(230,233,244,0.9);
+      border-radius: 18px; padding: 22px 24px;
+      box-shadow: 0 4px 16px -8px rgba(15,23,42,0.10);
+      position: relative;
+    }
+    .step::before {
+      content: attr(data-n);
+      position: absolute; top: -14px; left: 22px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 14px; font-weight: 700;
+      height: 30px; width: 30px; border-radius: 999px;
+      background: linear-gradient(135deg,#4F46E5,#06B6D4);
+      color: white; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 14px -4px rgba(79,70,229,0.4);
+    }
+    .step .title {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 16px; font-weight: 600; margin: 4px 0 8px;
+    }
+    .step .body { font-size: 13px; color: var(--ink-700); line-height: 1.55; margin-bottom: 10px; }
+    .step code {
+      font-family: "JetBrains Mono", monospace; font-size: 12px;
+      background: rgba(99,102,241,0.08); color: var(--brand-dark);
+      padding: 2px 6px; border-radius: 6px;
+    }
+    .step .tag {
+      display: inline-block; margin-top: 4px;
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em;
+      font-weight: 700; padding: 2px 8px; border-radius: 999px;
+      background: rgba(16,185,129,0.12); color: var(--emerald);
+    }
+
+    /* Docker table */
+    .docker-card {
+      background: white;
+      border: 1px solid rgba(230,233,244,0.9);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px -8px rgba(15,23,42,0.10);
+    }
+    .docker-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .docker-table thead th {
+      text-align: left;
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.14em; font-weight: 700; color: var(--ink-500);
+      padding: 12px 16px; background: var(--surface-50);
+      border-bottom: 1px solid var(--surface-200);
+    }
+    .docker-table tbody td {
+      padding: 10px 16px; vertical-align: middle;
+      border-bottom: 1px solid rgba(230,233,244,0.5);
+    }
+    .docker-table tbody tr:last-child td { border-bottom: none; }
+    .docker-table tbody tr:hover { background: rgba(238,242,255,0.5); }
+    .docker-table code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px; color: var(--brand-dark);
+      background: rgba(99,102,241,0.08);
+      padding: 2px 7px; border-radius: 6px;
+      white-space: nowrap;
+    }
+    .docker-table .tag {
+      display: inline-block;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.10em;
+      text-transform: uppercase; padding: 2px 8px; border-radius: 999px;
+      background: rgba(6,182,212,0.12); color: #0E7490;
+    }
+
+    footer {
+      margin-top: 60px; padding-top: 24px;
+      border-top: 1px solid var(--surface-200);
+      font-size: 13px; color: var(--ink-500);
+    }
+    footer a { color: var(--brand); text-decoration: none; font-weight: 600; }
+    footer a:hover { text-decoration: underline; }
+    footer code {
+      font-family: "JetBrains Mono", monospace; font-size: 12px;
+      background: rgba(99,102,241,0.08); color: var(--brand-dark);
+      padding: 2px 6px; border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">WealthSignal · Local Dev Stack</div>
+    <h1>All the links, one page.</h1>
+    <p>Every URL the local stack exposes — portals, FastAPI services, Airflow, MLflow, Postgres, Kafka, the whole observability chain. Click any card to open. Everything assumes <code style="background:rgba(255,255,255,0.15);color:white;">npm run run:local:all</code> is up.</p>
+    <div class="note">⚠ All services bind to <code style="background:rgba(255,255,255,0.15);color:white;">localhost</code>. If a card leads to <strong>ERR_CONNECTION_REFUSED</strong>, the specific container probably isn't up — run <code style="background:rgba(255,255,255,0.15);color:white;">npm run run:local:status</code> to see which tier is down.</div>
+  </div>
+
+  <!-- ═══ Suggested next try ═══════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-badge" style="background: linear-gradient(135deg,#10B981,#06B6D4);">✨</div>
+      <div>
+        <h2>Suggested next try</h2>
+        <div class="sub">Three steps, in order, to see the whole stack working end-to-end.</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step" data-n="1">
+        <div class="title">Bootstrap MLflow experiments</div>
+        <p class="body">Runs the <code>bootstrap_mlflow_experiments</code> Airflow DAG via admin_api — creates the four production (<code>wealth-*</code>) and four mastery (<code>mastery/wealth-*</code>) experiment slots.</p>
+        <p class="body"><code>npm run setup:local:mlflow:experiments</code></p>
+        <p class="body">Then refresh <a href="http://localhost:5050" target="_blank" style="color:var(--brand-dark);font-weight:600;">MLflow UI</a> and you should see the eight experiments listed.</p>
+        <span class="tag">Airflow → MLflow</span>
+      </div>
+
+      <div class="step" data-n="2">
+        <div class="title">Load the product catalogue</div>
+        <p class="body">From <a href="http://localhost:4201" target="_blank" style="color:var(--brand-dark);font-weight:600;">Admin Portal</a> left nav →
+          <strong>Domain Services → Product Catalog → Initial Data Load Setup</strong>. Click <strong>Start Initial Data Load</strong>.</p>
+        <p class="body">The page polls every 2 s. On success, shows inserted / updated / total counts — <code>load_product_catalog</code> DAG runs the UPSERT into <code>product_catalog.products</code>.</p>
+        <span class="tag">Portal → Airflow → Postgres</span>
+      </div>
+
+      <div class="step" data-n="3">
+        <div class="title">Try natural-language search</div>
+        <p class="body">Open the <a href="http://localhost:4202" target="_blank" style="color:var(--brand-dark);font-weight:600;">Customer Portal</a>. Type
+          <code>"tax-efficient ISA for first-time investor"</code> into the hero search box and hit <strong>Search</strong>.</p>
+        <p class="body">Top-6 ranked matches come back from <code>product_catalog_api</code>'s pg_trgm NLP endpoint, each card showing a match score + matched-term chips.</p>
+        <span class="tag">Portal → API → Postgres (pg_trgm)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Portals ══════════════════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-badge" style="background: linear-gradient(135deg,#4F46E5,#7C3AED);">🏛</div>
+      <div>
+        <h2>Portals (Angular)</h2>
+        <div class="sub">User-facing web applications.</div>
+      </div>
+    </div>
+    <div class="grid">
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#4F46E5,#06B6D4);" href="http://localhost:4201">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#4F46E5,#06B6D4);">AP</span>
+          <div class="card-title">Admin Portal</div>
+          <span class="pill">:4201</span>
+        </div>
+        <p class="card-desc">Internal operations console — Domain Services → Product Catalog (View All, Create, Search, Initial Data Load).</p>
+        <span class="card-url">http://localhost:4201</span>
+      </a>
+
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#0EA5E9,#10B981);" href="http://localhost:4202">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#0EA5E9,#10B981);">CP</span>
+          <div class="card-title">Customer Portal</div>
+          <span class="pill">:4202</span>
+        </div>
+        <p class="card-desc">Customer-facing app — NLP product search, criteria filters, multi-step wealth-product application flow.</p>
+        <span class="card-url">http://localhost:4202</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ Middleware APIs ══════════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-badge" style="background: linear-gradient(135deg,#10B981,#06B6D4);">🔌</div>
+      <div>
+        <h2>Middleware APIs (FastAPI)</h2>
+        <div class="sub">OpenAPI docs auto-served at <code style="font-family:monospace;">/docs</code> on each port.</div>
+      </div>
+    </div>
+    <div class="grid">
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#4F46E5,#7C3AED);" href="http://localhost:8001/docs">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#4F46E5,#7C3AED);">AA</span>
+          <div class="card-title">admin_api</div>
+          <span class="pill">:8001</span>
+        </div>
+        <p class="card-desc">Model Registry, Initial Data Load trigger, MLflow bootstrap, async job polling. Paired with admin_portal.</p>
+        <span class="card-url">http://localhost:8001/docs</span>
+      </a>
+
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#0EA5E9,#10B981);" href="http://localhost:8002/docs">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#0EA5E9,#10B981);">CA</span>
+          <div class="card-title">customer_api</div>
+          <span class="pill">:8002</span>
+        </div>
+        <p class="card-desc">Application drafts, submissions, offer landings, customer self-view. Paired with customer_portal.</p>
+        <span class="card-url">http://localhost:8002/docs</span>
+      </a>
+
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#F59E0B,#F97316);" href="http://localhost:8003/docs">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#F59E0B,#F97316);">DM</span>
+          <div class="card-title">data_management_api</div>
+          <span class="pill">:8003</span>
+        </div>
+        <p class="card-desc">Async Airflow DAG orchestration — Kaggle ingestion, PyTorch training, artefact retrieval.</p>
+        <span class="card-url">http://localhost:8003/docs</span>
+      </a>
+
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#06B6D4,#4F46E5);" href="http://localhost:8004/docs">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#06B6D4,#4F46E5);">PC</span>
+          <div class="card-title">product_catalog_api</div>
+          <span class="pill">:8004</span>
+        </div>
+        <p class="card-desc">CRUD + criteria + NLP search (pg_trgm) over ~10,000 wealth-management products.</p>
+        <span class="card-url">http://localhost:8004/docs</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ Orchestration & ML lifecycle ═════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-badge" style="background: linear-gradient(135deg,#F59E0B,#EC4899);">⚡</div>
+      <div>
+        <h2>Orchestration &amp; ML lifecycle</h2>
+        <div class="sub">Where all the heavy compute lives.</div>
+      </div>
+    </div>
+    <div class="grid">
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#017CEE,#22D3EE);" href="http://localhost:8080">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#017CEE,#22D3EE);">AF</span>
+          <div class="card-title">Apache Airflow</div>
+          <span class="pill">:8080</span>
+        </div>
+        <p class="card-desc">DAG scheduler &amp; UI. Look for <code>load_product_catalog</code> and <code>bootstrap_mlflow_experiments</code>.</p>
+        <span class="card-url">http://localhost:8080</span>
+        <div class="card-creds">admin / admin</div>
+      </a>
+
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#0194E2,#06B6D4);" href="http://localhost:5050">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#0194E2,#06B6D4);">ML</span>
+          <div class="card-title">MLflow Tracking</div>
+          <span class="pill">:5050</span>
+        </div>
+        <p class="card-desc">Experiment tracking + Model Registry. Host port 5050 (not 5000) to dodge macOS AirPlay.</p>
+        <span class="card-url">http://localhost:5050</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ Observability ════════════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-badge" style="background: linear-gradient(135deg,#F46800,#EF4444);">📊</div>
+      <div>
+        <h2>Observability</h2>
+        <div class="sub">Metrics, dashboards, logs.</div>
+      </div>
+    </div>
+    <div class="grid">
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#F46800,#F59E0B);" href="http://localhost:3000">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#F46800,#F59E0B);">GF</span>
+          <div class="card-title">Grafana</div>
+          <span class="pill">:3000</span>
+        </div>
+        <p class="card-desc">Dashboards. Prometheus + Elasticsearch data sources provisioned automatically on boot.</p>
+        <span class="card-url">http://localhost:3000</span>
+        <div class="card-creds">admin / admin</div>
+      </a>
+
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#E6522C,#F97316);" href="http://localhost:9090">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#E6522C,#F97316);">PM</span>
+          <div class="card-title">Prometheus</div>
+          <span class="pill">:9090</span>
+        </div>
+        <p class="card-desc">Time-series metrics. Scrape targets: middleware APIs + MLflow.</p>
+        <span class="card-url">http://localhost:9090</span>
+      </a>
+
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#005571,#0EA5E9);" href="http://localhost:5601">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#005571,#0EA5E9);">KB</span>
+          <div class="card-title">Kibana</div>
+          <span class="pill">:5601</span>
+        </div>
+        <p class="card-desc">Log exploration over the <code>logs-wealthsignal-*</code> Elasticsearch indices.</p>
+        <span class="card-url">http://localhost:5601</span>
+      </a>
+
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#005571,#0891B2);" href="http://localhost:9200">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#005571,#0891B2);">ES</span>
+          <div class="card-title">Elasticsearch (REST)</div>
+          <span class="pill">:9200</span>
+        </div>
+        <p class="card-desc">Raw HTTP API for the log store. Try <code>/_cluster/health</code>.</p>
+        <span class="card-url">http://localhost:9200</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ Data & messaging ════════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-badge" style="background: linear-gradient(135deg,#4169E1,#06B6D4);">💾</div>
+      <div>
+        <h2>Data &amp; messaging</h2>
+        <div class="sub">Stores + the event bus.</div>
+      </div>
+    </div>
+    <div class="grid">
+      <a class="link-card" style="--accent-gradient: linear-gradient(135deg,#231F20,#06B6D4);" href="http://localhost:8085">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#231F20,#06B6D4);">KU</span>
+          <div class="card-title">Kafka UI (Provectus)</div>
+          <span class="pill">:8085</span>
+        </div>
+        <p class="card-desc">Broker browser — topics, consumers, messages. Cluster name: <code>wealthsignal-local</code>.</p>
+        <span class="card-url">http://localhost:8085</span>
+      </a>
+
+      <div class="link-card" style="--accent-gradient: linear-gradient(135deg,#4169E1,#6366F1);">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#4169E1,#6366F1);">PG</span>
+          <div class="card-title">Postgres</div>
+          <span class="pill pill-info">:5432</span>
+        </div>
+        <p class="card-desc">Shared database — schemas: <code>airflow</code>, <code>mlflow</code>, <code>product_catalog</code>, <code>customer</code>, <code>admin_ops</code>, <code>data_management</code>.</p>
+        <span class="card-url" style="cursor:default;">postgresql://wealthsignal@localhost:5432/wealthsignal</span>
+        <div class="card-creds">wealthsignal / wealthsignal</div>
+      </div>
+
+      <div class="link-card" style="--accent-gradient: linear-gradient(135deg,#231F20,#334155);">
+        <div class="card-head">
+          <span class="card-icon" style="background: linear-gradient(135deg,#231F20,#334155);">KF</span>
+          <div class="card-title">Kafka broker</div>
+          <span class="pill pill-info">:9092 / :9094</span>
+        </div>
+        <p class="card-desc">PLAINTEXT listener — <code>9092</code> in-container, <code>9094</code> for host-network clients (FastAPI on the host).</p>
+        <span class="card-url" style="cursor:default;">localhost:9094</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Flagship flows ═══════════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-badge" style="background: linear-gradient(135deg,#10B981,#06B6D4);">🚀</div>
+      <div>
+        <h2>Flagship user flows</h2>
+        <div class="sub">The end-to-end scenarios worth clicking.</div>
+      </div>
+    </div>
+    <div class="action-grid">
+      <a class="action-card" href="http://localhost:4201/domain-services/product-catalog/initial-load"
+         style="background: linear-gradient(120deg,#F59E0B 0%,#F97316 45%,#EC4899 100%);">
+        <div class="label">Admin Portal flow</div>
+        <div class="title">Initial Data Load</div>
+        <div class="desc">Trigger the <code>load_product_catalog</code> DAG via admin_api. Watch inserted / updated / total counts stream in as the portal polls every 2 s.</div>
+        <div class="cta">localhost:4201/…/initial-load ↗</div>
+      </a>
+
+      <a class="action-card" href="http://localhost:4202"
+         style="background: linear-gradient(120deg,#0EA5E9 0%,#06B6D4 45%,#10B981 100%);">
+        <div class="label">Customer Portal flow</div>
+        <div class="title">Natural-language search</div>
+        <div class="desc">Type "tax-efficient ISA for first-time investor" into the hero search — hits product_catalog_api's pg_trgm NLP endpoint, returns ranked matches with matched-term chips.</div>
+        <div class="cta">localhost:4202 ↗</div>
+      </a>
+
+      <a class="action-card" href="http://localhost:4201/domain-services/product-catalog"
+         style="background: linear-gradient(120deg,#4F46E5 0%,#7C3AED 45%,#06B6D4 100%);">
+        <div class="label">Admin Portal flow</div>
+        <div class="title">Browse the catalogue</div>
+        <div class="desc">Paginated grid over <code>/api/v1/products</code> with SRRI pills + gradient avatars per asset class. Row click opens the product detail.</div>
+        <div class="cta">localhost:4201/…/product-catalog ↗</div>
+      </a>
+
+      <a class="action-card" href="http://localhost:4202/products"
+         style="background: linear-gradient(120deg,#10B981 0%,#06B6D4 45%,#4F46E5 100%);">
+        <div class="label">Customer Portal flow</div>
+        <div class="title">Refine by criteria</div>
+        <div class="desc">Left filter rail (asset class, SRRI range, target segment, max min-investment) drives <code>POST /products/search/criteria</code>.</div>
+        <div class="cta">localhost:4202/products ↗</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ All HTTP endpoints ═══════════════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-badge" style="background: linear-gradient(135deg,#4F46E5,#06B6D4);">🌐</div>
+      <div>
+        <h2>All HTTP endpoints</h2>
+        <div class="sub">Every link this application exposes — organised by service.</div>
+      </div>
+    </div>
+
+    <!-- Admin Portal deep links -->
+    <h3 style="font-family:'Space Grotesk';font-size:16px;margin:20px 0 10px;color:#4338CA;">Admin Portal (Angular · :4201)</h3>
+    <div class="docker-card">
+      <table class="docker-table">
+        <thead><tr><th style="width:30%;">Screen</th><th>URL</th><th style="width:45%;">Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>Dashboard</td><td><a href="http://localhost:4201/dashboard"><code>http://localhost:4201/dashboard</code></a></td><td>Hero + KPIs + live catalog health</td></tr>
+          <tr><td>Product Catalog · View All</td><td><a href="http://localhost:4201/domain-services/product-catalog"><code>/domain-services/product-catalog</code></a></td><td>Paginated grid from <code>/api/v1/products</code></td></tr>
+          <tr><td>Product Catalog · Create</td><td><a href="http://localhost:4201/domain-services/product-catalog/create"><code>/domain-services/product-catalog/create</code></a></td><td>Admin form (disabled until auth)</td></tr>
+          <tr><td>Product Catalog · Search</td><td><a href="http://localhost:4201/domain-services/product-catalog/search"><code>/domain-services/product-catalog/search</code></a></td><td>Criteria-based search UI</td></tr>
+          <tr><td>Product Catalog · Initial Data Load</td><td><a href="http://localhost:4201/domain-services/product-catalog/initial-load"><code>/domain-services/product-catalog/initial-load</code></a></td><td>Triggers the UPSERT DAG</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Customer Portal deep links -->
+    <h3 style="font-family:'Space Grotesk';font-size:16px;margin:20px 0 10px;color:#0369A1;">Customer Portal (Angular · :4202)</h3>
+    <div class="docker-card">
+      <table class="docker-table">
+        <thead><tr><th style="width:30%;">Screen</th><th>URL</th><th style="width:45%;">Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>Landing (NLP search)</td><td><a href="http://localhost:4202/"><code>http://localhost:4202/</code></a></td><td>Hero search + value pillars + CTA</td></tr>
+          <tr><td>Explore products</td><td><a href="http://localhost:4202/products"><code>http://localhost:4202/products</code></a></td><td>Grid + filter rail, criteria search</td></tr>
+          <tr><td>Apply for a product</td><td><code>http://localhost:4202/apply/&lt;sku&gt;</code></td><td>4-step application wizard with draft persistence</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- admin_api endpoints -->
+    <h3 style="font-family:'Space Grotesk';font-size:16px;margin:20px 0 10px;color:#4338CA;">admin_api (FastAPI · :8001)</h3>
+    <div class="docker-card">
+      <table class="docker-table">
+        <thead><tr><th style="width:32%;">Endpoint</th><th style="width:10%;">Method</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><a href="http://localhost:8001/docs"><code>/docs</code></a></td><td><span class="tag">GET</span></td><td>Swagger UI</td></tr>
+          <tr><td><a href="http://localhost:8001/redoc"><code>/redoc</code></a></td><td><span class="tag">GET</span></td><td>ReDoc UI</td></tr>
+          <tr><td><a href="http://localhost:8001/openapi.json"><code>/openapi.json</code></a></td><td><span class="tag">GET</span></td><td>OpenAPI 3.1 spec</td></tr>
+          <tr><td><a href="http://localhost:8001/health"><code>/health</code></a></td><td><span class="tag">GET</span></td><td>Liveness</td></tr>
+          <tr><td><a href="http://localhost:8001/ready"><code>/ready</code></a></td><td><span class="tag">GET</span></td><td>Readiness</td></tr>
+          <tr><td><a href="http://localhost:8001/version"><code>/version</code></a></td><td><span class="tag">GET</span></td><td>Build info</td></tr>
+          <tr><td><a href="http://localhost:8001/api/v1/models"><code>/api/v1/models</code></a></td><td><span class="tag">GET</span></td><td>List registered models</td></tr>
+          <tr><td><code>/api/v1/models/{name}/promote</code></td><td><span class="tag">POST</span></td><td>Promote a model version</td></tr>
+          <tr><td><code>/api/v1/product-catalog/initial-load</code></td><td><span class="tag">POST</span></td><td>Trigger the UPSERT DAG</td></tr>
+          <tr><td><code>/api/v1/mlflow/bootstrap-experiments</code></td><td><span class="tag">POST</span></td><td>Trigger MLflow bootstrap DAG</td></tr>
+          <tr><td><a href="http://localhost:8001/api/v1/jobs"><code>/api/v1/jobs</code></a></td><td><span class="tag">GET</span></td><td>List recent jobs</td></tr>
+          <tr><td><code>/api/v1/jobs/{id}</code></td><td><span class="tag">GET</span></td><td>Poll single job</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- customer_api endpoints -->
+    <h3 style="font-family:'Space Grotesk';font-size:16px;margin:20px 0 10px;color:#047857;">customer_api (FastAPI · :8002)</h3>
+    <div class="docker-card">
+      <table class="docker-table">
+        <thead><tr><th style="width:32%;">Endpoint</th><th style="width:10%;">Method</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><a href="http://localhost:8002/docs"><code>/docs</code></a></td><td><span class="tag">GET</span></td><td>Swagger UI</td></tr>
+          <tr><td><a href="http://localhost:8002/redoc"><code>/redoc</code></a></td><td><span class="tag">GET</span></td><td>ReDoc UI</td></tr>
+          <tr><td><a href="http://localhost:8002/openapi.json"><code>/openapi.json</code></a></td><td><span class="tag">GET</span></td><td>OpenAPI spec</td></tr>
+          <tr><td><a href="http://localhost:8002/health"><code>/health</code></a></td><td><span class="tag">GET</span></td><td>Liveness</td></tr>
+          <tr><td><a href="http://localhost:8002/api/v1/me"><code>/api/v1/me</code></a></td><td><span class="tag">GET</span></td><td>Customer self-view (stub)</td></tr>
+          <tr><td><code>/api/v1/applications/draft</code></td><td><span class="tag">POST</span></td><td>Create a partial-form draft</td></tr>
+          <tr><td><code>/api/v1/applications/draft/{id}</code></td><td><span class="tag">PUT/GET</span></td><td>Update / fetch draft</td></tr>
+          <tr><td><code>/api/v1/applications/{id}/submit</code></td><td><span class="tag">POST</span></td><td>Submit application</td></tr>
+          <tr><td><code>/api/v1/offers/{token}</code></td><td><span class="tag">GET</span></td><td>Resolve offer-email landing</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- data_management_api endpoints -->
+    <h3 style="font-family:'Space Grotesk';font-size:16px;margin:20px 0 10px;color:#B45309;">data_management_api (FastAPI · :8003)</h3>
+    <div class="docker-card">
+      <table class="docker-table">
+        <thead><tr><th style="width:32%;">Endpoint</th><th style="width:10%;">Method</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><a href="http://localhost:8003/docs"><code>/docs</code></a></td><td><span class="tag">GET</span></td><td>Swagger UI</td></tr>
+          <tr><td><a href="http://localhost:8003/redoc"><code>/redoc</code></a></td><td><span class="tag">GET</span></td><td>ReDoc UI</td></tr>
+          <tr><td><a href="http://localhost:8003/openapi.json"><code>/openapi.json</code></a></td><td><span class="tag">GET</span></td><td>OpenAPI spec</td></tr>
+          <tr><td><a href="http://localhost:8003/health"><code>/health</code></a></td><td><span class="tag">GET</span></td><td>Liveness</td></tr>
+          <tr><td><a href="http://localhost:8003/api/v1/jobs"><code>/api/v1/jobs</code></a></td><td><span class="tag">GET/POST</span></td><td>List / submit DAG runs</td></tr>
+          <tr><td><code>/api/v1/jobs/{id}</code></td><td><span class="tag">GET</span></td><td>Poll single DAG run</td></tr>
+          <tr><td><code>/api/v1/jobs/{id}/artefacts</code></td><td><span class="tag">GET</span></td><td>Files produced by a DAG</td></tr>
+          <tr><td><code>/api/v1/ingest/kaggle</code></td><td><span class="tag">POST</span></td><td>Kaggle-ingestion shortcut</td></tr>
+          <tr><td><code>/api/v1/train/pytorch</code></td><td><span class="tag">POST</span></td><td>PyTorch-training shortcut</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- product_catalog_api endpoints -->
+    <h3 style="font-family:'Space Grotesk';font-size:16px;margin:20px 0 10px;color:#0E7490;">product_catalog_api (FastAPI · :8004)</h3>
+    <div class="docker-card">
+      <table class="docker-table">
+        <thead><tr><th style="width:32%;">Endpoint</th><th style="width:10%;">Method</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><a href="http://localhost:8004/docs"><code>/docs</code></a></td><td><span class="tag">GET</span></td><td>Swagger UI</td></tr>
+          <tr><td><a href="http://localhost:8004/redoc"><code>/redoc</code></a></td><td><span class="tag">GET</span></td><td>ReDoc UI</td></tr>
+          <tr><td><a href="http://localhost:8004/openapi.json"><code>/openapi.json</code></a></td><td><span class="tag">GET</span></td><td>OpenAPI spec</td></tr>
+          <tr><td><a href="http://localhost:8004/health"><code>/health</code></a></td><td><span class="tag">GET</span></td><td>Liveness</td></tr>
+          <tr><td><a href="http://localhost:8004/ready"><code>/ready</code></a></td><td><span class="tag">GET</span></td><td>Readiness (pings Postgres)</td></tr>
+          <tr><td><a href="http://localhost:8004/api/v1/products"><code>/api/v1/products</code></a></td><td><span class="tag">GET/POST</span></td><td>List / create</td></tr>
+          <tr><td><code>/api/v1/products/{uuid}</code></td><td><span class="tag">GET/PUT/DELETE</span></td><td>Read / update / soft-delete</td></tr>
+          <tr><td><code>/api/v1/products/sku/{sku}</code></td><td><span class="tag">GET</span></td><td>Look up by SKU</td></tr>
+          <tr><td><code>/api/v1/products/search/criteria</code></td><td><span class="tag">POST</span></td><td>Filter-based search</td></tr>
+          <tr><td><code>/api/v1/products/search/nlp</code></td><td><span class="tag">POST</span></td><td>Natural-language search (pg_trgm)</td></tr>
+          <tr><td><a href="http://localhost:8004/api/v1/categories"><code>/api/v1/categories</code></a></td><td><span class="tag">GET</span></td><td>Distribution counts</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Airflow -->
+    <h3 style="font-family:'Space Grotesk';font-size:16px;margin:20px 0 10px;color:#075985;">Apache Airflow (:8080)</h3>
+    <div class="docker-card">
+      <table class="docker-table">
+        <thead><tr><th style="width:32%;">URL</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><a href="http://localhost:8080"><code>http://localhost:8080</code></a></td><td>Airflow UI (admin / admin)</td></tr>
+          <tr><td><a href="http://localhost:8080/dags/load_product_catalog/grid"><code>/dags/load_product_catalog/grid</code></a></td><td>Product-catalogue UPSERT DAG</td></tr>
+          <tr><td><a href="http://localhost:8080/dags/bootstrap_mlflow_experiments/grid"><code>/dags/bootstrap_mlflow_experiments/grid</code></a></td><td>MLflow experiments bootstrap DAG</td></tr>
+          <tr><td><a href="http://localhost:8080/api/v1/dags"><code>/api/v1/dags</code></a></td><td>REST API — list DAGs</td></tr>
+          <tr><td><a href="http://localhost:8080/api/v1/health"><code>/api/v1/health</code></a></td><td>REST API — scheduler health</td></tr>
+          <tr><td><a href="http://localhost:8080/connections/list"><code>/connections/list</code></a></td><td>Connections (wealthsignal_postgres)</td></tr>
+          <tr><td><a href="http://localhost:8080/variable/list"><code>/variable/list</code></a></td><td>Airflow variables</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- MLflow -->
+    <h3 style="font-family:'Space Grotesk';font-size:16px;margin:20px 0 10px;color:#0C4A6E;">MLflow (:5050)</h3>
+    <div class="docker-card">
+      <table class="docker-table">
+        <thead><tr><th style="width:32%;">URL</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><a href="http://localhost:5050"><code>http://localhost:5050</code></a></td><td>MLflow UI</td></tr>
+          <tr><td><a href="http://localhost:5050/#/models"><code>/#/models</code></a></td><td>Model Registry</td></tr>
+          <tr><td><a href="http://localhost:5050/api/2.0/mlflow/experiments/search"><code>/api/2.0/mlflow/experiments/search</code></a></td><td>REST — list experiments</td></tr>
+          <tr><td><a href="http://localhost:5050/api/2.0/mlflow/registered-models/list"><code>/api/2.0/mlflow/registered-models/list</code></a></td><td>REST — list registered models</td></tr>
+          <tr><td><a href="http://localhost:5050/health"><code>/health</code></a></td><td>Liveness</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Observability -->
+    <h3 style="font-family:'Space Grotesk';font-size:16px;margin:20px 0 10px;color:#B45309;">Observability</h3>
+    <div class="docker-card">
+      <table class="docker-table">
+        <thead><tr><th style="width:32%;">URL</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><a href="http://localhost:3000"><code>http://localhost:3000</code></a></td><td>Grafana UI (admin / admin)</td></tr>
+          <tr><td><a href="http://localhost:3000/datasources"><code>/datasources</code></a></td><td>Grafana data sources</td></tr>
+          <tr><td><a href="http://localhost:3000/dashboards"><code>/dashboards</code></a></td><td>Grafana dashboards</td></tr>
+          <tr><td><a href="http://localhost:3000/api/health"><code>/api/health</code></a></td><td>Grafana health</td></tr>
+          <tr><td><a href="http://localhost:9090"><code>http://localhost:9090</code></a></td><td>Prometheus UI</td></tr>
+          <tr><td><a href="http://localhost:9090/targets"><code>/targets</code></a></td><td>Scrape targets + last-scrape status</td></tr>
+          <tr><td><a href="http://localhost:9090/graph"><code>/graph</code></a></td><td>Query explorer</td></tr>
+          <tr><td><a href="http://localhost:9090/-/healthy"><code>/-/healthy</code></a></td><td>Liveness</td></tr>
+          <tr><td><a href="http://localhost:5601"><code>http://localhost:5601</code></a></td><td>Kibana</td></tr>
+          <tr><td><a href="http://localhost:5601/app/discover"><code>/app/discover</code></a></td><td>Log exploration</td></tr>
+          <tr><td><a href="http://localhost:5601/app/dev_tools"><code>/app/dev_tools</code></a></td><td>ES query console</td></tr>
+          <tr><td><a href="http://localhost:9200/_cluster/health"><code>http://localhost:9200/_cluster/health</code></a></td><td>ES cluster health JSON</td></tr>
+          <tr><td><a href="http://localhost:9200/_cat/indices"><code>/_cat/indices</code></a></td><td>Index listing</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Kafka -->
+    <h3 style="font-family:'Space Grotesk';font-size:16px;margin:20px 0 10px;color:#334155;">Kafka</h3>
+    <div class="docker-card">
+      <table class="docker-table">
+        <thead><tr><th style="width:32%;">URL</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><a href="http://localhost:8085"><code>http://localhost:8085</code></a></td><td>Provectus Kafka UI</td></tr>
+          <tr><td><a href="http://localhost:8085/ui/clusters/wealthsignal-local/all-topics"><code>/ui/clusters/wealthsignal-local/all-topics</code></a></td><td>All topics</td></tr>
+          <tr><td><a href="http://localhost:8085/ui/clusters/wealthsignal-local/consumer-groups"><code>/…/consumer-groups</code></a></td><td>Consumer groups</td></tr>
+          <tr><td><code>localhost:9094</code></td><td>Broker PLAINTEXT (from host)</td></tr>
+          <tr><td><code>kafka:9092</code></td><td>Broker (inside wealthsignal-net)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      <strong>Can't reach a URL?</strong> Run <code>npm run run:local:status</code> to see which tier is down, or <code>docker logs &lt;container&gt;</code> for the failing service.
+      Bring the whole stack up with <code>npm run run:local:all</code> and tear it down (wipes volumes) with <code>npm run run:local:shutdown</code>.
+    </p>
+    <p>
+      Related docs:
+      <a href="README.md">README.md</a> ·
+      <a href="CONTRIBUTING.md">CONTRIBUTING.md</a> ·
+      <a href="README_NPM_Commands.md">README_NPM_Commands.md</a> ·
+      <a href="README_NPM_Commands.html">README_NPM_Commands.html</a>
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>

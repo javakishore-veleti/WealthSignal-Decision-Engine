@@ -70,7 +70,8 @@
     "run:local:portals:customer": "npm run start --workspace=portals/customer_portal",
 
     "//4": "─── RUN · STACK: everything at once ──────────────────────────",
-    "run:local:all": "npm-run-all -s run:local:docker:all run:local:middleware:all run:local:portals:all",
+    "run:local:all": "npm-run-all -s run:local:docker:all run:local:middleware:all run:local:portals:all run:local:open-links",
+    "run:local:open-links": "bash DevOps/Local/open-local-links.sh",
     "run:local:status": "npm-run-all -s run:local:docker:status run:local:middleware:status run:local:portals:status",
     "run:local:shutdown": "npm-run-all -s run:local:portals:shutdown run:local:middleware:shutdown run:local:docker:shutdown",
     "run:local:shutdown:keep-data": "npm-run-all -s run:local:portals:shutdown run:local:middleware:shutdown run:local:docker:shutdown:keep-data",
