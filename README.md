@@ -114,63 +114,63 @@ Production decision engine for the wealth-management division. When a customer b
 - **Serving:** FastAPI 0.111, Uvicorn, Pydantic v2
 - **Quality:** Black, Ruff, mypy, pre-commit, pytest
 
-## Repository structure
+## Repository layout
 
-```
-middleware/
-├── admin_api/                 ↔ admin_portal
-├── customer_api/              ↔ customer_portal
-└── data_management_api/       async orchestration → Airflow
+Top-level folders: `middleware/` (FastAPI APIs), `portals/` (Angular apps), `airflow/` (DAGs), `engine/` (PyTorch ML core), `DevOps/Local/` (Docker + lifecycle scripts), plus standard `tests/`, `docs/`, `.github/`.
 
-portals/
-├── admin_portal/
-└── customer_portal/
+The **full folder tree, pairing rules, and naming conventions** live in [CONTRIBUTING.md](CONTRIBUTING.md) — that keeps this README focused on *what the system does*, not *where each file sits*.
 
-airflow/
-├── dags/{ingestion,training,scoring}/
-├── plugins/
-└── config/
+## Key design decisions
 
-engine/wealthsignal/
-├── config/      data/      models/
-├── training/    serving/   tracking.py
+- **Monorepo**, managed by the root `package.json` (operational only — npm workspaces point at the Angular portals).
+- **Middleware = FastAPI.** Every API (`admin_api`, `customer_api`, `data_management_api`) is built on FastAPI + Pydantic v2.
+- **Portals = Angular 17.** TypeScript strict; two standalone Angular apps (`admin_portal`, `customer_portal`) managed as npm workspaces.
+- **All PyTorch compute runs in Apache Airflow.** Middleware never trains or does heavy feature engineering — it serves cached Model Registry artefacts or submits Airflow DAG runs.
+- **`data_management_api` is async-only.** Every heavy operation returns a `job_id` and defers execution to Airflow; clients poll for status.
+- **DevOps at the repo root.** `DevOps/Local/` ships docker-compose stacks for Airflow, Postgres, Kafka, Grafana, Prometheus, Kibana, plus `up`/`status`/`shutdown` lifecycle scripts used by the `npm run run:local:*` commands.
+- **Chat log preserved** in [README_Claude_Kishore_ChatLog.md](README_Claude_Kishore_ChatLog.md) — running record of collaboration decisions.
 
-DevOps/Local/
-├── docker-all-{up,down,status}.sh
-├── airflow/docker-compose.yml
-├── postgres/docker-compose.yml
-├── kafka/docker-compose.yml
-└── Observability/{Grafana,Prometheus,Kibana}/
-
-tests/       docs/       .github/
-```
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full conventions — branch naming, commit scopes, FastAPI patterns, Airflow DAG rules, and the async job protocol used by `data_management_api`.
-
-### Quick local start
+## Quick local start
 
 ```bash
-# Bring up all infrastructure (Airflow, Postgres, Kafka, observability)
-npm run docker:up
-# or directly:
-./DevOps/Local/docker-all-up.sh
+# One-time setup (conda env, Python deps, npm deps, pre-commit)
+npm run setup:local:all
 
-# Endpoints
-# Airflow: http://localhost:8080   MLflow: http://localhost:5000
-# Grafana: http://localhost:3000   Kibana: http://localhost:5601
+# Bring the entire stack up (infra → middleware → portals)
+npm run run:local:all
 
-# FastAPI services (each on its own port)
-npm run api:admin          # admin_api           → localhost:8001
-npm run api:customer       # customer_api        → localhost:8002
-npm run api:data-management # data_management_api → localhost:8003
+# Tier-level lifecycle
+npm run run:local:docker:{all,status,shutdown}
+npm run run:local:middleware:{all,status,shutdown}
+npm run run:local:portals:{all,status,shutdown}
 
-# Angular portals (npm workspaces)
-npm run portals:install
-npm run dev:admin          # admin_portal
-npm run dev:customer       # customer_portal
+# Whole-stack tear-down
+npm run run:local:shutdown
 ```
 
-> The root `package.json` is **operational only** — it orchestrates Docker, FastAPI services, and Angular workspaces. No runtime JavaScript lives at the repo root.
+Background processes write PIDs to `.local/pids/` and logs to `.local/logs/` (both gitignored). `status` probes ports + `/health`; `shutdown` sends SIGTERM and falls back to port cleanup.
+
+### Infrastructure endpoints
+
+| Service     | URL                       |
+|-------------|---------------------------|
+| Airflow UI  | http://localhost:8080     |
+| MLflow UI   | http://localhost:5000     |
+| Grafana     | http://localhost:3000     |
+| Prometheus  | http://localhost:9090     |
+| Kibana      | http://localhost:5601     |
+| Postgres    | localhost:5432            |
+| Kafka       | localhost:9092            |
+
+### Middleware + portal ports
+
+| Tier | Service | Port |
+|---|---|---|
+| Middleware | `admin_api` | 8001 |
+| Middleware | `customer_api` | 8002 |
+| Middleware | `data_management_api` | 8003 |
+| Portal | `admin_portal` | 4201 |
+| Portal | `customer_portal` | 4202 |
 
 ## Research anchor
 

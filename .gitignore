@@ -1,3 +1,9 @@
+# ── Local operational state (DevOps/Local scripts write PIDs and logs here) ──
+.local/
+node_modules/
+dist/
+.angular/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wealthsignal"
+version = "0.1.0"
+description = "Wealth-management decision engine — PyTorch models scoring partial application forms for completion probability, customer segment, and next-best-action."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "Kishore Veleti", email = "javakishore@gmail.com" },
+]
+keywords = [
+    "wealth-management", "fintech", "pytorch", "mlflow",
+    "fastapi", "airflow", "customer-r1", "decision-engine",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "ruff==0.4.*",
+    "black==24.*",
+    "mypy>=1.10",
+    "pytest>=8.2",
+    "pytest-cov>=5.0",
+    "pytest-asyncio>=0.23",
+    "pre-commit>=3.7",
+]
+
+[project.urls]
+Homepage = "https://github.com/javakishore-veleti/WealthSignal-Decision-Engine"
+Repository = "https://github.com/javakishore-veleti/WealthSignal-Decision-Engine"
+Issues = "https://github.com/javakishore-veleti/WealthSignal-Decision-Engine/issues"
+
+# ── Tooling configuration ────────────────────────────────────────────────
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["engine*", "middleware*"]
+exclude = ["tests*", "portals*", "airflow*", "DevOps*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["portals", "airflow/dags/**/sample_*.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4", "SIM", "ARG", "PTH"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311", "py312"]
+extend-exclude = "portals|airflow/dags/.*sample_.*\\.py"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "integration: tests that hit MLflow, GPU, or external services",
+    "slow: long-running tests",
+]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+exclude = ["portals/", "airflow/dags/"]
