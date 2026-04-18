@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 

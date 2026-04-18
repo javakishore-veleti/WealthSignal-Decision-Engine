@@ -32,7 +32,10 @@ app = FastAPI(
         {"name": "health", "description": "Liveness, readiness, and build info."},
         {"name": "products", "description": "CRUD and listing."},
         {"name": "search", "description": "Criteria-based and natural-language search."},
-        {"name": "categories", "description": "Categorical distribution — powers UI filters and dashboards."},
+        {
+            "name": "categories",
+            "description": "Categorical distribution — powers UI filters and dashboards.",
+        },
     ],
 )
 

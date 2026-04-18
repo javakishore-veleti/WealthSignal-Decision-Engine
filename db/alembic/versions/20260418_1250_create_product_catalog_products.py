@@ -23,7 +23,8 @@ from collections.abc import Sequence
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects.postgresql import ARRAY, UUID as PG_UUID
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
 # revision identifiers, used by Alembic.
 revision: str = "001_create_products"
@@ -68,12 +69,8 @@ def upgrade() -> None:
         sa.Column("tags", ARRAY(sa.String()), nullable=False, server_default="{}"),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
-        sa.CheckConstraint(
-            "risk_level BETWEEN 1 AND 7", name="ck_products_risk_level_range"
-        ),
-        sa.CheckConstraint(
-            "fee_bps BETWEEN 0 AND 1000", name="ck_products_fee_bps_range"
-        ),
+        sa.CheckConstraint("risk_level BETWEEN 1 AND 7", name="ck_products_risk_level_range"),
+        sa.CheckConstraint("fee_bps BETWEEN 0 AND 1000", name="ck_products_fee_bps_range"),
         sa.CheckConstraint("min_investment >= 0", name="ck_products_min_investment_nonneg"),
         sa.CheckConstraint("aum >= 0", name="ck_products_aum_nonneg"),
         schema=SCHEMA,
@@ -101,15 +98,11 @@ def upgrade() -> None:
 
     # ── GIN indexes for high-selectivity lookups ──────────────────────────────
     # Tag array containment queries: `WHERE tags @> ARRAY['esg']`
-    op.execute(
-        f"CREATE INDEX ix_{TABLE}_tags_gin "
-        f"ON {SCHEMA}.{TABLE} USING GIN (tags)"
-    )
+    op.execute(f"CREATE INDEX ix_{TABLE}_tags_gin " f"ON {SCHEMA}.{TABLE} USING GIN (tags)")
     # Fuzzy name search via pg_trgm: supports `WHERE name ILIKE '%...%'` and
     # similarity() ranking for the NLP search endpoint.
     op.execute(
-        f"CREATE INDEX ix_{TABLE}_name_trgm "
-        f"ON {SCHEMA}.{TABLE} USING GIN (name gin_trgm_ops)"
+        f"CREATE INDEX ix_{TABLE}_name_trgm " f"ON {SCHEMA}.{TABLE} USING GIN (name gin_trgm_ops)"
     )
     op.execute(
         f"CREATE INDEX ix_{TABLE}_short_description_trgm "

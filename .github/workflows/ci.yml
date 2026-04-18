@@ -1,10 +1,8 @@
 name: CI
 
+# Manual-only. The owner triggers this from the Actions tab when they
+# want lint + tests to run, rather than burning CI minutes on every push.
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 concurrency:

@@ -98,7 +98,7 @@ DEFAULT_ARGS = {
         "'Initial Data Load Setup' action."
     ),
     start_date=datetime(2026, 4, 18, tzinfo=UTC),
-    schedule=None,                      # manual trigger only
+    schedule=None,  # manual trigger only
     catchup=False,
     max_active_runs=1,
     default_args=DEFAULT_ARGS,
@@ -123,14 +123,18 @@ def load_product_catalog() -> None:
     # ── Task 2 : UPSERT in a single transaction ───────────────────────────────
     @task(task_id="upsert_products")
     def upsert_products(manifest: dict) -> dict:
+        # manifest is passed in only to enforce task ordering (XCom dependency);
+        # we re-read the JSON here to keep memory off the scheduler.
+        del manifest
         with SEED_PATH.open(encoding="utf-8") as f:
             records: list[dict] = json.load(f)
 
         hook = PostgresHook(postgres_conn_id=POSTGRES_CONN_ID)
         rows = [_to_db_tuple(r) for r in records]
 
-        log.info("Beginning UPSERT of %d products into %s.%s",
-                 len(rows), TARGET_SCHEMA, TARGET_TABLE)
+        log.info(
+            "Beginning UPSERT of %d products into %s.%s", len(rows), TARGET_SCHEMA, TARGET_TABLE
+        )
 
         with hook.get_conn() as conn:
             with conn.cursor() as cur:
@@ -148,7 +152,9 @@ def load_product_catalog() -> None:
         updated = len(rows) - inserted
         log.info(
             "UPSERT complete — inserted=%d updated=%d total_after=%d",
-            inserted, updated, post_count,
+            inserted,
+            updated,
+            post_count,
         )
         return {
             "inserted": inserted,

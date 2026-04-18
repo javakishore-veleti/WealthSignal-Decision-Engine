@@ -55,17 +55,17 @@ DEFAULT_OUT = Path("data/product_catalog/products_seed.json")
 
 # Approximate real-world mix across a large wealth-management shelf.
 PRODUCT_TYPE_WEIGHTS: dict[ProductType, float] = {
-    ProductType.MUTUAL_FUND:       0.35,
-    ProductType.ETF:               0.18,
-    ProductType.BOND:              0.12,
+    ProductType.MUTUAL_FUND: 0.35,
+    ProductType.ETF: 0.18,
+    ProductType.BOND: 0.12,
     ProductType.INVESTMENT_ACCOUNT: 0.10,
-    ProductType.PENSION:           0.06,
-    ProductType.STRUCTURED:        0.05,
-    ProductType.INSURANCE:         0.04,
-    ProductType.ANNUITY:           0.03,
-    ProductType.MONEY_MARKET:      0.03,
-    ProductType.REIT:              0.02,
-    ProductType.PRIVATE_EQUITY:    0.02,
+    ProductType.PENSION: 0.06,
+    ProductType.STRUCTURED: 0.05,
+    ProductType.INSURANCE: 0.04,
+    ProductType.ANNUITY: 0.03,
+    ProductType.MONEY_MARKET: 0.03,
+    ProductType.REIT: 0.02,
+    ProductType.PRIVATE_EQUITY: 0.02,
 }
 
 # Asset-class distribution conditioned on product type.
@@ -132,11 +132,11 @@ ESG_WEIGHTS: dict[EsgRating, float] = {
 # Customer segment affinity — maps risk level + min-investment to segment.
 SEGMENT_RULES: list[tuple[int, Decimal, CustomerSegment]] = [
     # (max_risk_level, min_investment_threshold, segment)
-    (2, Decimal("5000"),      CustomerSegment.PASSIVE_HOLDER),
-    (3, Decimal("10000"),     CustomerSegment.MID_TIER_SAVER),
-    (4, Decimal("1000"),      CustomerSegment.YOUNG_INVESTOR),
-    (5, Decimal("50000"),     CustomerSegment.RETIREMENT_PLANNER),
-    (7, Decimal("250000"),    CustomerSegment.HIGH_WEALTH_PROSPECT),
+    (2, Decimal("5000"), CustomerSegment.PASSIVE_HOLDER),
+    (3, Decimal("10000"), CustomerSegment.MID_TIER_SAVER),
+    (4, Decimal("1000"), CustomerSegment.YOUNG_INVESTOR),
+    (5, Decimal("50000"), CustomerSegment.RETIREMENT_PLANNER),
+    (7, Decimal("250000"), CustomerSegment.HIGH_WEALTH_PROSPECT),
 ]
 
 
@@ -183,7 +183,9 @@ def _build_name(
         name = f"{issuer} {geography.value} Money Market Fund"
         short = f"Short-duration cash fund from {issuer} focused on {geography.value}."
     elif product_type == ProductType.INSURANCE:
-        name = f"{issuer} {rng.choice(['Whole Life', 'Variable Life', 'Term Life'])} Investment Plan"
+        name = (
+            f"{issuer} {rng.choice(['Whole Life', 'Variable Life', 'Term Life'])} Investment Plan"
+        )
         short = f"Life-assurance-wrapped investment plan from {issuer}."
     elif product_type == ProductType.PRIVATE_EQUITY:
         sector = rng.choice(SECTORS)
@@ -329,7 +331,9 @@ def generate_product(idx: int, rng: random.Random, fake: Faker) -> dict:
         AssetClass.ALTERNATIVE: TimeHorizon.LONG,
         AssetClass.COMMODITY: rng.choice([TimeHorizon.MEDIUM, TimeHorizon.LONG]),
         AssetClass.REAL_ESTATE: TimeHorizon.LONG,
-    }[asset_class]  # type: ignore[index]
+    }[
+        asset_class
+    ]  # type: ignore[index]
 
     liquidity_bias = {
         ProductType.ETF: Liquidity.DAILY,

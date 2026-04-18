@@ -76,6 +76,28 @@ extend-exclude = ["portals", "airflow/dags/**/sample_*.py"]
 select = ["E", "F", "I", "UP", "B", "C4", "SIM", "ARG", "PTH"]
 ignore = ["E501"]
 
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's idiomatic dependency-injection pattern uses Depends(...) in
+# argument defaults; Query/Path/Body/Header/Cookie share the same shape.
+# They are not mutable instances, so we whitelist them here.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Cookie",
+    "fastapi.File",
+    "fastapi.Form",
+    "fastapi.Security",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Alembic env.py must run statements between imports (set_main_option before
+# importing metadata) so E402 is unavoidable — the file is intentionally
+# procedural.
+"db/alembic/env.py" = ["E402"]
+
 [tool.black]
 line-length = 100
 target-version = ["py311", "py312"]

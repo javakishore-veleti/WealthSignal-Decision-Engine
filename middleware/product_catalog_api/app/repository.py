@@ -18,7 +18,7 @@ from __future__ import annotations
 import re
 from uuid import UUID
 
-from sqlalchemy import case, delete, func, literal, select, text, update
+from sqlalchemy import delete, func, literal, select, update
 from sqlalchemy.orm import Session
 
 from .db.models import Product
@@ -65,14 +65,10 @@ class ProductRepository:
             "created_at": Product.created_at,
         }
         order_col = sort_map.get(sort_by, Product.name)
-        stmt = stmt.order_by(
-            order_col.desc() if sort_dir.lower() == "desc" else order_col.asc()
-        )
+        stmt = stmt.order_by(order_col.desc() if sort_dir.lower() == "desc" else order_col.asc())
 
         # Total count — share the where clause.
-        count_stmt = select(func.count()).select_from(
-            stmt.order_by(None).subquery()
-        )
+        count_stmt = select(func.count()).select_from(stmt.order_by(None).subquery())
         total = int(self._session.execute(count_stmt).scalar_one())
 
         stmt = stmt.offset((page - 1) * page_size).limit(page_size)
@@ -177,12 +173,7 @@ class ProductRepository:
     def update_partial(self, product_id: UUID, changes: dict) -> Product | None:
         if not changes:
             return self.get_by_id(product_id)
-        stmt = (
-            update(Product)
-            .where(Product.id == product_id)
-            .values(**changes)
-            .returning(Product)
-        )
+        stmt = update(Product).where(Product.id == product_id).values(**changes).returning(Product)
         row = self._session.execute(stmt).scalar_one_or_none()
         self._session.commit()
         return row
@@ -237,8 +228,6 @@ class ProductRepository:
             (str(level), int(count)) for level, count in self._session.execute(risk_stmt)
         ]
 
-        total_stmt = select(func.count()).select_from(Product).where(
-            Product.is_active.is_(True)
-        )
+        total_stmt = select(func.count()).select_from(Product).where(Product.is_active.is_(True))
         out["_total"] = [("total", int(self._session.execute(total_stmt).scalar_one()))]
         return out

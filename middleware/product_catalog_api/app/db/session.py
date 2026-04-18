@@ -15,9 +15,7 @@ from functools import lru_cache
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-DEFAULT_LOCAL_URL = (
-    "postgresql+psycopg://wealthsignal:wealthsignal@localhost:5432/wealthsignal"
-)
+DEFAULT_LOCAL_URL = "postgresql+psycopg://wealthsignal:wealthsignal@localhost:5432/wealthsignal"
 
 
 def _resolve_url() -> str:

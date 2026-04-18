@@ -39,7 +39,9 @@ def _orm_to_schema(row: ProductOrm) -> Product:
 def list_products(
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query(ge=1, le=200)] = 20,
-    sort_by: Annotated[str, Query(pattern="^(name|sku|aum|fee_bps|risk_level|launch_date|created_at)$")] = "name",
+    sort_by: Annotated[
+        str, Query(pattern="^(name|sku|aum|fee_bps|risk_level|launch_date|created_at)$")
+    ] = "name",
     sort_dir: Annotated[str, Query(pattern="^(asc|desc)$")] = "asc",
     active_only: bool = True,
     repo: ProductRepository = Depends(_repo),
