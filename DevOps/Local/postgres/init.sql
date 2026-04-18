@@ -3,6 +3,7 @@
 -- we can migrate/drop independently during development.
 
 CREATE SCHEMA IF NOT EXISTS airflow;
+CREATE SCHEMA IF NOT EXISTS mlflow;
 CREATE SCHEMA IF NOT EXISTS product_catalog;
 CREATE SCHEMA IF NOT EXISTS customer;
 CREATE SCHEMA IF NOT EXISTS admin_ops;
