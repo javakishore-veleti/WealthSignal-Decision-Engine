@@ -34,10 +34,11 @@ config.set_main_option("sqlalchemy.url", DB_URL)
 
 # ── Target metadata ──────────────────────────────────────────────────────────
 # Import service-owned SQLAlchemy MetaData objects here as they come online.
-# Example (once Product Catalog lands):
-#     from middleware.product_catalog_api.app.db.models import metadata as product_catalog_md
-#     target_metadata = product_catalog_md
-target_metadata = None
+# All services share one Alembic timeline; they can be split per-service later
+# if migration cadences diverge.
+from middleware.product_catalog_api.app.db.models import metadata as product_catalog_metadata
+
+target_metadata = product_catalog_metadata
 
 
 def run_migrations_offline() -> None:
