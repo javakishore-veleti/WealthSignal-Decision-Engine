@@ -32,6 +32,15 @@ DEFAULT_LOCAL_URL = "postgresql+psycopg://wealthsignal:wealthsignal@localhost:54
 DB_URL = os.environ.get("WEALTHSIGNAL_DB_URL", DEFAULT_LOCAL_URL)
 config.set_main_option("sqlalchemy.url", DB_URL)
 
+# ── Version-table isolation ──────────────────────────────────────────────────
+# The shared Postgres instance hosts several Alembic-driven tools at once
+# (Airflow, MLflow, and us). Each tool's default tracking table is named
+# `alembic_version`; if any of them happens to share a schema search path,
+# their revision IDs collide. We namespace ours to a distinctive name + a
+# service-owned schema so nothing else ever reads our table by accident.
+VERSION_TABLE = "wealthsignal_alembic_version"
+VERSION_TABLE_SCHEMA = "product_catalog"
+
 # ── Target metadata ──────────────────────────────────────────────────────────
 # Import service-owned SQLAlchemy MetaData objects here as they come online.
 # All services share one Alembic timeline; they can be split per-service later
@@ -49,6 +58,8 @@ def run_migrations_offline() -> None:
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
         compare_type=True,
+        version_table=VERSION_TABLE,
+        version_table_schema=VERSION_TABLE_SCHEMA,
     )
     with context.begin_transaction():
         context.run_migrations()
@@ -67,6 +78,8 @@ def run_migrations_online() -> None:
             target_metadata=target_metadata,
             compare_type=True,
             include_schemas=True,
+            version_table=VERSION_TABLE,
+            version_table_schema=VERSION_TABLE_SCHEMA,
         )
         with context.begin_transaction():
             context.run_migrations()
