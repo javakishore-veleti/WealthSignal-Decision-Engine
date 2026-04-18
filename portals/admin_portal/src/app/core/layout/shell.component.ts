@@ -245,11 +245,11 @@ export class ShellComponent {
   );
 
   /** Current top-nav section derived from the URL. */
-  readonly topSection = toSignal<TopSection>(
+  readonly topSection = toSignal(
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
       startWith(null),
-      map(() => this.resolveTopSection(this.router.url)),
+      map((): TopSection => this.resolveTopSection(this.router.url)),
     ),
     { initialValue: this.resolveTopSection(this.router.url) },
   );

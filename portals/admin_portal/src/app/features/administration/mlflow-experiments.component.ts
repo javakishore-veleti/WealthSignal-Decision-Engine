@@ -133,20 +133,7 @@ interface ExperimentSlot {
           }
         </div>
 
-        @if (!job()) {
-          <div class="flex-1 flex flex-col items-center justify-center text-center py-10">
-            <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-brand-500 to-accent-500
-                        flex items-center justify-center mb-4 shadow-glow">
-              <svg viewBox="0 0 24 24" fill="none" class="h-6 w-6 text-white">
-                <path d="M4 17l5-5 4 4 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <div class="text-sm text-ink-500 max-w-xs">
-              Press <span class="font-semibold text-ink-700">Bootstrap Experiments</span>
-              to start.
-            </div>
-          </div>
-        } @else if (job(); as j) {
+        @if (job(); as j) {
           <div class="space-y-3 text-sm">
             <div class="flex justify-between">
               <span class="text-ink-500">Job ID</span>
@@ -200,6 +187,19 @@ interface ExperimentSlot {
               </div>
             </div>
           }
+        } @else {
+          <div class="flex-1 flex flex-col items-center justify-center text-center py-10">
+            <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-brand-500 to-accent-500
+                        flex items-center justify-center mb-4 shadow-glow">
+              <svg viewBox="0 0 24 24" fill="none" class="h-6 w-6 text-white">
+                <path d="M4 17l5-5 4 4 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="text-sm text-ink-500 max-w-xs">
+              Press <span class="font-semibold text-ink-700">Bootstrap Experiments</span>
+              to start.
+            </div>
+          </div>
         }
       </div>
     </section>
