@@ -1,6 +1,5 @@
 # WealthSignal Decision Engine
 
-[![CI](https://github.com/javakishore-veleti/WealthSignal-Decision-Engine/actions/workflows/ci.yml/badge.svg)](https://github.com/javakishore-veleti/WealthSignal-Decision-Engine/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-active%20development-FFA500)]()
 [![Domain](https://img.shields.io/badge/domain-Wealth%20Management-1B3A5C)]()
@@ -94,16 +93,18 @@ Production decision engine for the wealth-management division. When a customer b
 
 | Component | Role |
 |---|---|
-| **`customer_portal`** | Customer-facing digital-form UI |
-| **`admin_portal`** | Internal operations console (model registry, promotions, audit) |
-| **`customer_api`** (FastAPI) | Real-time scoring + offer trigger — pairs with `customer_portal` |
-| **`admin_api`** (FastAPI) | Model registry ops, promotions, audit trail — pairs with `admin_portal` |
-| **`data_management_api`** (FastAPI, async) | Submits Airflow DAG runs for ingestion, downloads, PyTorch training; streams job status; exposes artefacts |
-| **Apache Airflow** | Executes all heavy compute (Kaggle ingestion, PyTorch training, batch scoring, DVC commits) |
+| **`customer_portal`** | Customer-facing digital-form UI + product search |
+| **`admin_portal`** | Internal operations console (model registry, product catalog, audit) |
+| **`customer_api`** (FastAPI, :8002) | Real-time scoring + offer trigger — pairs with `customer_portal` |
+| **`admin_api`** (FastAPI, :8001) | Model registry ops, promotions, audit — pairs with `admin_portal` |
+| **`data_management_api`** (FastAPI, :8003, async) | Submits Airflow DAG runs for ingestion, downloads, PyTorch training; streams job status; exposes artefacts |
+| **`product_catalog_api`** (FastAPI, :8004) | CRUD + criteria + NLP (pg_trgm) search over ~10K wealth products; consumed by both portals |
+| **Apache Airflow** | Executes all heavy compute (Kaggle ingestion, PyTorch training, batch scoring, DVC commits, product-catalog UPSERT) |
 | **`engine/wealthsignal`** | ML core — PyTorch models, training loops, MLflow helpers |
+| **`db/`** | Cloud-agnostic Alembic migration timeline (local / AWS / Azure / GCP) |
 | **Kafka** | Event bus for async job events, drift alerts, audit logs |
-| **Postgres** | Airflow metadata + application schemas |
-| **Grafana / Prometheus / Kibana** | Observability stack (metrics, dashboards, logs) |
+| **Postgres** | Airflow metadata + per-service application schemas (product_catalog, customer, admin_ops, data_management) |
+| **Grafana / Prometheus / Kibana / MLflow** | Observability stack (metrics, dashboards, logs, experiment tracking) |
 
 ## Tech stack
 
@@ -129,7 +130,8 @@ The **full folder tree, pairing rules, and naming conventions** live in [CONTRIB
 - **`data_management_api` is async-only.** Every heavy operation returns a `job_id` and defers execution to Airflow; clients poll for status.
 - **DB migrations via Alembic (cloud-agnostic).** `db/alembic/` is the single migration timeline. A manual GitHub Actions workflow (`Database Migration`) applies it to `local`, `aws`, `azure`, or `gcp` — each is a GitHub Environment with its own `WEALTHSIGNAL_DB_URL` secret. `docker-all-up.sh` simulates the same workflow locally after Postgres becomes healthy.
 - **DevOps at the repo root.** `DevOps/Local/` ships docker-compose stacks for Airflow, Postgres, Kafka, Grafana, Prometheus, Elasticsearch, Kibana, and MLflow, plus `up`/`status`/`shutdown` lifecycle scripts used by the `npm run run:local:*` commands. All containers attach to a shared `wealthsignal-net` Docker network.
-- **Product Catalog** (in progress): a separate FastAPI service on port 8004 with CRUD + criteria + NLP search over ~10,000 wealth-management products. Data is generated programmatically (no per-product hardcoding) and written to a seed JSON; the Admin Portal exposes an **Initial Data Load Setup** action that triggers an Airflow DAG to **UPSERT** the catalogue into Postgres — idempotent, safe to re-run.
+- **Product Catalog**: a dedicated FastAPI service on port 8004 with CRUD, criteria search, and NLP search (Postgres pg_trgm similarity) over ~10,000 wealth-management products. Data is generated programmatically (no per-product hardcoding) and written to `data/product_catalog/products_seed.json` as the source of truth. The Admin Portal's **Initial Data Load Setup** action triggers the `load_product_catalog` Airflow DAG, which **UPSERTs** on `sku` — idempotent, safe to click twice. See [`middleware/product_catalog_api/`](middleware/product_catalog_api/) and [`airflow/dags/ingestion/load_product_catalog.py`](airflow/dags/ingestion/load_product_catalog.py).
+- **GitHub Actions are manual-only.** There is no auto-triggered CI. The only workflow in the repo is `db-migrate.yml` (manual dispatch, target env = local / aws / azure / gcp). Run `ruff check .` and `black --check .` locally before pushing.
 - **Chat log preserved** in [README_Claude_Kishore_ChatLog.md](README_Claude_Kishore_ChatLog.md) — running record of collaboration decisions.
 
 ## Quick local start
