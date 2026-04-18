@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, HostListener, inject, signal } from
 import { CommonModule, DatePipe } from "@angular/common";
 
 import { SystemHealthService } from "../services/system-health.service";
-import { ServiceHealth } from "../models/system-health.model";
+import { ServiceStatus } from "../models/system-health.model";
 
 /**
  * Top-bar health badge. Shows the overall status of the local stack
@@ -23,14 +23,12 @@ import { ServiceHealth } from "../models/system-health.model";
                bg-white/10 hover:bg-white/20 backdrop-blur
                text-xs font-semibold tracking-wide
                transition-colors duration-200">
-        <!-- Dot — colour by overall status -->
+        <!-- Dot — colour + glow bound via inline style (Tailwind arbitrary
+             values like shadow-[0_0_8px_...] don't parse inside Angular's
+             [class.…] binding syntax). -->
         <span class="h-2 w-2 rounded-full"
-              [class.bg-emerald-400]="health.overall() === 'healthy'"
-              [class.bg-gold-400]="health.overall() === 'degraded'"
-              [class.bg-rose-400]="health.overall() === 'unreachable'"
-              [class.shadow-[0_0_8px_rgba(16,185,129,0.8)]]="health.overall() === 'healthy'"
-              [class.shadow-[0_0_8px_rgba(251,191,36,0.8)]]="health.overall() === 'degraded'"
-              [class.shadow-[0_0_8px_rgba(251,113,133,0.8)]]="health.overall() === 'unreachable'"></span>
+              [style.background]="overallDotColor()"
+              [style.box-shadow]="overallDotGlow()"></span>
 
         @switch (health.overall()) {
           @case ("healthy") { <span>ALL SYSTEMS</span> }
@@ -53,13 +51,7 @@ import { ServiceHealth } from "../models/system-health.model";
                     bg-white rounded-2xl shadow-popover border border-surface-200
                     text-ink-900 overflow-hidden animate-[fadeIn_0.2s_ease-out]">
           <div class="p-5 border-b border-surface-200"
-               [class.bg-gradient-to-br]="true"
-               [class.from-emerald-500/5]="health.overall() === 'healthy'"
-               [class.to-emerald-500/10]="health.overall() === 'healthy'"
-               [class.from-gold-500/5]="health.overall() === 'degraded'"
-               [class.to-gold-500/10]="health.overall() === 'degraded'"
-               [class.from-rose-500/5]="health.overall() === 'unreachable'"
-               [class.to-rose-500/10]="health.overall() === 'unreachable'">
+               [style.background]="headerGradient()">
             <div class="flex items-center justify-between mb-1">
               <div class="font-display font-bold text-base">Stack health</div>
               <button (click)="refresh(); $event.stopPropagation()"
@@ -108,9 +100,7 @@ import { ServiceHealth } from "../models/system-health.model";
                           border-b border-surface-100 last:border-b-0
                           hover:bg-surface-50 transition-colors duration-150">
                 <span class="h-2.5 w-2.5 rounded-full shrink-0"
-                      [class.bg-emerald-500]="svc.status === 'up'"
-                      [class.bg-gold-500]="svc.status === 'degraded'"
-                      [class.bg-rose-500]="svc.status === 'down'"></span>
+                      [style.background]="serviceDotColor(svc.status)"></span>
                 <div class="min-w-0 flex-1">
                   <div class="font-mono text-sm font-semibold truncate">{{ svc.name }}</div>
                   @if (svc.error) {
@@ -144,6 +134,44 @@ export class HealthBadgeComponent {
     if (overall === "healthy") return "All systems nominal — click for details";
     if (overall === "unreachable") return "admin_api unreachable — click for details";
     return `${this.health.issueCount()} issue(s) — click for details`;
+  }
+
+  /** Top-bar dot colour — HSL/RGB values avoid Angular's class-binding issues with Tailwind arbitrary values. */
+  overallDotColor(): string {
+    switch (this.health.overall()) {
+      case "healthy":     return "#34D399";   // emerald-400
+      case "degraded":    return "#FBBF24";   // amber-400
+      case "unreachable": return "#FB7185";   // rose-400
+    }
+  }
+
+  overallDotGlow(): string {
+    switch (this.health.overall()) {
+      case "healthy":     return "0 0 8px rgba(16, 185, 129, 0.8)";
+      case "degraded":    return "0 0 8px rgba(251, 191, 36, 0.8)";
+      case "unreachable": return "0 0 8px rgba(251, 113, 133, 0.8)";
+    }
+  }
+
+  /** Dropdown-header tint — a soft gradient matching the overall status. */
+  headerGradient(): string {
+    switch (this.health.overall()) {
+      case "healthy":
+        return "linear-gradient(135deg, rgba(16,185,129,0.05), rgba(16,185,129,0.10))";
+      case "degraded":
+        return "linear-gradient(135deg, rgba(245,158,11,0.05), rgba(245,158,11,0.10))";
+      case "unreachable":
+        return "linear-gradient(135deg, rgba(244,63,94,0.05), rgba(244,63,94,0.10))";
+    }
+  }
+
+  /** Per-service dot colour used in the dropdown list rows. */
+  serviceDotColor(status: ServiceStatus): string {
+    switch (status) {
+      case "up":       return "#10B981";   // emerald-500
+      case "degraded": return "#F59E0B";   // amber-500
+      case "down":     return "#EF4444";   // rose-500
+    }
   }
 
   toggle(): void {

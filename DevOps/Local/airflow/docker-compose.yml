@@ -15,6 +15,10 @@ x-airflow-common: &airflow-common
   environment:
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    # New DAGs are unpaused by default so REST API triggers actually run
+    # (Airflow's default 'paused at creation' makes `POST /dagRuns` return
+    # 200 but the scheduler ignores it — silent failure we just hit).
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://wealthsignal:wealthsignal@postgres:5432/wealthsignal
     AIRFLOW__CORE__SQL_ALCHEMY_SCHEMA: airflow
     AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
