@@ -1,0 +1,20 @@
+# @package model
+name: sequence
+_target_: engine.wealthsignal.models.sequence.FormActionLSTM
+
+vocab_size: 128                    # distinct form-field actions
+embedding_dim: 64
+hidden_dim: 256
+num_layers: 2
+dropout: 0.2
+bidirectional: false
+use_attention: true
+max_seq_length: 64
+
+loss:
+  _target_: torch.nn.CrossEntropyLoss
+  ignore_index: -100
+
+metric:
+  primary: accuracy_at_1
+  secondary: [macro_f1, perplexity]

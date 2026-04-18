@@ -1,0 +1,19 @@
+# @package model
+name: segmentation
+_target_: engine.wealthsignal.models.segmentation.WealthAutoencoder
+
+input_dim: 1024
+encoder_dims: [512, 128, 32]
+decoder_dims: [128, 512, 1024]
+latent_dim: 32
+dropout: 0.1
+
+clustering:
+  _target_: sklearn.cluster.KMeans
+  n_clusters: 5
+  random_state: ${seed}
+  n_init: 10
+
+metric:
+  primary: silhouette
+  secondary: [reconstruction_mse, davies_bouldin]

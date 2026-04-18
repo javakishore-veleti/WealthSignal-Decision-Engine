@@ -1,0 +1,19 @@
+# @package model
+name: form_classifier
+_target_: engine.wealthsignal.models.form_classifier.FormCompletionPredictor
+
+input_dim: 256
+hidden_dims: [512, 256]
+output_dim: 1
+dropout: 0.3
+activation: gelu
+use_batchnorm: true
+
+loss:
+  _target_: engine.wealthsignal.training.loss.FocalLoss
+  alpha: 0.25
+  gamma: 2.0
+
+metric:
+  primary: roc_auc
+  secondary: [pr_auc, f1]

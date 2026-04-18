@@ -1,0 +1,28 @@
+# Hydra master config — composed from the defaults list below.
+#
+# Override any field on the command line:
+#   python -m engine.wealthsignal.training.train model=rl_policy training=fast
+
+defaults:
+  - _self_
+  - model: form_classifier
+  - training: default
+  - data: home_credit
+  - tracking: mlflow
+
+# ── Global knobs ────────────────────────────────────────────────────────────
+experiment: wealthsignal
+run_name: ${model.name}-${now:%Y%m%d-%H%M%S}
+seed: 42
+device: auto                       # one of: auto | cuda | mps | cpu
+output_dir: outputs/${now:%Y-%m-%d}/${run_name}
+
+# ── Hydra itself ────────────────────────────────────────────────────────────
+hydra:
+  run:
+    dir: ${output_dir}
+  sweep:
+    dir: outputs/sweeps/${now:%Y-%m-%d}
+    subdir: ${hydra.job.num}
+  job:
+    chdir: false                   # keep cwd at repo root so data/ paths resolve

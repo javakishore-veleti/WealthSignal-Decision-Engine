@@ -1,0 +1,59 @@
+# WealthSignal Decision Engine — pre-commit hooks.
+#
+# Hooks mirror what the `Database Migration` GitHub workflow expects locally.
+# Install once after `npm run setup:local:all`:   pre-commit install
+
+repos:
+  # ── Fast Python linter + formatter (replaces isort + flake8) ──────────────
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.10
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        exclude: ^(data/|db/alembic/versions/)
+      - id: ruff-format
+        exclude: ^(data/|db/alembic/versions/)
+
+  # ── Black (kept alongside ruff-format for committers who still run it) ────
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        language_version: python3.11
+        exclude: ^data/
+
+  # ── Hygiene ───────────────────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^data/
+      - id: end-of-file-fixer
+        exclude: ^data/
+      - id: check-yaml
+        args: [--unsafe]          # allow YAML custom tags (hydra, airflow)
+      - id: check-toml
+      - id: check-json
+        exclude: ^portals/.*/tsconfig.*\.json$   # tsconfigs permit comments
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=15000]     # products_seed.json is ~12 MB
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: debug-statements
+
+  # ── Type checking on engine/ only (middleware is too-rapidly-changing) ───
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        files: ^engine/wealthsignal/
+        additional_dependencies:
+          - pydantic>=2.7
+
+  # ── shellcheck on DevOps scripts ──────────────────────────────────────────
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+        files: ^DevOps/Local/.*\.sh$

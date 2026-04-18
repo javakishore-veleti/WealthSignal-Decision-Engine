@@ -1,0 +1,21 @@
+# @package training
+# CI-friendly — runs to completion in under a minute on CPU.
+num_epochs: 1
+batch_size: 16
+num_workers: 0
+limit_train_batches: 4
+limit_val_batches: 2
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 1.0e-3
+  weight_decay: 0.0
+
+scheduler: null
+gradient_clip_val: 1.0
+
+early_stopping:
+  enabled: false
+
+checkpoint:
+  save_top_k: 0

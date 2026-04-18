@@ -1,0 +1,12 @@
+# @package data
+name: lending_club
+kaggle_slug: "wordsforthewise/lending-club"
+kaggle_kind: dataset
+raw_dir: data/raw/lending_club
+processed_path: data/processed/lending_club_features.parquet
+approx_size_gb: 2.5
+target_column: loan_status
+split:
+  train: 0.70
+  val: 0.15
+  test: 0.15

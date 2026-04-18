@@ -1,0 +1,9 @@
+# @package data
+name: otto
+kaggle_slug: "otto-recommender-system"
+kaggle_kind: competition
+raw_dir: data/raw/otto
+processed_path: data/processed/otto_sessions.parquet
+approx_size_gb: 6.4
+max_sessions: 1_000_000
+max_actions_per_session: 64

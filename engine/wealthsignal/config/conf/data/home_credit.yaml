@@ -1,0 +1,13 @@
+# @package data
+name: home_credit
+kaggle_slug: "home-credit-default-risk"
+kaggle_kind: competition
+raw_dir: data/raw/home_credit
+processed_path: data/processed/home_credit_features.parquet
+approx_size_gb: 2.7
+target_column: TARGET
+split:
+  train: 0.70
+  val: 0.15
+  test: 0.15
+  stratify_on: TARGET

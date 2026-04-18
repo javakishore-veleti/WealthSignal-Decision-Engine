@@ -1,0 +1,10 @@
+# @package tracking
+name: mlflow
+tracking_uri: ${oc.env:MLFLOW_TRACKING_URI,http://localhost:5000}
+# Experiment namespacing convention documented in DevOps/Local/mlflow/docker-compose.yml.
+#   - Production decision-engine runs   → 'wealth-*'
+#   - PyTorch-mastery / learning runs   → 'mastery/wealth-*'
+experiment: wealth-${model.name}
+register_model: true
+log_artifacts: true
+autolog: true
