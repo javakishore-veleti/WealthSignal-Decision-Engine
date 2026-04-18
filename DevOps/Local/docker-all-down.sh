@@ -14,19 +14,19 @@ for arg in "$@"; do
 done
 
 echo "▶ Stopping MLflow..."
-docker compose -f mlflow/docker-compose.yml down "${DOWN_FLAGS[@]}" || true
+docker compose -f mlflow/docker-compose.yml down ${DOWN_FLAGS[@]+"${DOWN_FLAGS[@]}"} || true
 
 echo "▶ Stopping Observability..."
-docker compose -f Observability/docker-compose.yml down "${DOWN_FLAGS[@]}" || true
+docker compose -f Observability/docker-compose.yml down ${DOWN_FLAGS[@]+"${DOWN_FLAGS[@]}"} || true
 
 echo "▶ Stopping Airflow..."
-docker compose -f airflow/docker-compose.yml down "${DOWN_FLAGS[@]}" || true
+docker compose -f airflow/docker-compose.yml down ${DOWN_FLAGS[@]+"${DOWN_FLAGS[@]}"} || true
 
 echo "▶ Stopping Kafka..."
-docker compose -f kafka/docker-compose.yml down "${DOWN_FLAGS[@]}" || true
+docker compose -f kafka/docker-compose.yml down ${DOWN_FLAGS[@]+"${DOWN_FLAGS[@]}"} || true
 
 echo "▶ Stopping Postgres..."
-docker compose -f postgres/docker-compose.yml down "${DOWN_FLAGS[@]}" || true
+docker compose -f postgres/docker-compose.yml down ${DOWN_FLAGS[@]+"${DOWN_FLAGS[@]}"} || true
 
 if [ "${1:-}" = "--prune-network" ]; then
   docker network rm wealthsignal-net 2>/dev/null || true
