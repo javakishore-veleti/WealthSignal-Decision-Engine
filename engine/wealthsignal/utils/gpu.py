@@ -19,7 +19,7 @@ class AcceleratorInfo:
     """Structured snapshot of the detected accelerator."""
 
     available: bool
-    backend: str                # 'cuda' | 'mps' | 'cpu'
+    backend: str  # 'cuda' | 'mps' | 'cpu'
     display_name: str
     device_count: int
     total_memory_gb: float | None
@@ -80,11 +80,7 @@ def print_report() -> int:
     info = detect_accelerator()
 
     status = "✔ available" if info.available else "✖ unavailable"
-    mem = (
-        f"{info.total_memory_gb:.1f} GB"
-        if info.total_memory_gb is not None
-        else "—"
-    )
+    mem = f"{info.total_memory_gb:.1f} GB" if info.total_memory_gb is not None else "—"
 
     print("═══ WealthSignal · Accelerator report ═══")
     print(f"  Backend     : {info.backend}")
