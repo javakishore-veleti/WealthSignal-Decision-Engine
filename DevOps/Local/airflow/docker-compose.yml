@@ -45,7 +45,7 @@ x-airflow-common: &airflow-common
       condition: service_completed_successfully
 
 services:
-  # One-shot init: migrate DB and create the admin user.
+  # One-shot init: wait for Postgres, migrate the metadata DB, create the admin user.
   airflow-init:
     <<: *airflow-common
     container_name: ws-airflow-init
@@ -53,7 +53,22 @@ services:
     command:
       - -c
       - |
-        airflow db migrate &&
+        set -e
+        echo "Waiting for metadata DB to accept connections..."
+        for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+          if airflow db check >/dev/null 2>&1; then
+            echo "Postgres reachable."
+            break
+          fi
+          echo "  attempt $$i — sleeping 2s"
+          sleep 2
+        done
+        # `airflow db migrate` MUST succeed for the stack to be usable.
+        # Letting it fall through with `|| true` masked a silent scheduler
+        # crash loop ('No log_template entry found for ID None').
+        airflow db migrate
+        echo "DB migration complete."
+        # user-create is idempotent on re-runs; tolerate 'already exists'.
         airflow users create \
           --role Admin --username admin --password admin \
           --firstname Kishore --lastname Veleti --email admin@wealthsignal.local || true

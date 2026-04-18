@@ -15,6 +15,18 @@ docker network inspect "$NET" >/dev/null 2>&1 || docker network create "$NET"
 echo "▶ Starting Postgres (shared metadata + app schemas)..."
 docker compose -f postgres/docker-compose.yml up -d
 
+# Wait for Postgres to accept connections BEFORE starting anything that
+# depends on it. Previously Airflow's migration sometimes raced Postgres
+# startup, half-migrated the schema, and left the scheduler in a crash
+# loop on 'No log_template entry found'.
+echo "▶ Waiting for Postgres to accept connections..."
+for _ in $(seq 1 30); do
+  if docker exec ws-postgres pg_isready -U wealthsignal -d wealthsignal >/dev/null 2>&1; then
+    break
+  fi
+  sleep 1
+done
+
 echo "▶ Starting Kafka (event bus)..."
 docker compose -f kafka/docker-compose.yml up -d
 
@@ -37,13 +49,7 @@ docker compose -f mlflow/docker-compose.yml up -d
 # In cloud environments, .github/workflows/db-migrate.yml runs Alembic against
 # AWS / Azure / GCP. Here we apply the same migrations against the local
 # docker-compose Postgres so developer laptops converge on the same schema.
-echo "▶ Waiting for Postgres to accept connections..."
-for _ in $(seq 1 30); do
-  if docker exec ws-postgres pg_isready -U wealthsignal -d wealthsignal >/dev/null 2>&1; then
-    break
-  fi
-  sleep 1
-done
+# (Postgres readiness was already waited on above.)
 
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 if command -v alembic >/dev/null 2>&1 && [ -f "$REPO_ROOT/db/alembic.ini" ]; then
