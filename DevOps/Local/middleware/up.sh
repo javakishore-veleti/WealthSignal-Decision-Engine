@@ -31,4 +31,5 @@ echo "▶ Starting middleware services..."
 start_service admin_api            "middleware.admin_api.app.main:app"            8001
 start_service customer_api         "middleware.customer_api.app.main:app"         8002
 start_service data_management_api  "middleware.data_management_api.app.main:app"  8003
+start_service product_catalog_api  "middleware.product_catalog_api.app.main:app"  8004
 echo "✔ Middleware up. Use 'npm run run:local:middleware:status' to inspect."

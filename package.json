@@ -42,6 +42,9 @@
     "run:local:middleware:admin": "uvicorn middleware.admin_api.app.main:app --reload --port 8001",
     "run:local:middleware:customer": "uvicorn middleware.customer_api.app.main:app --reload --port 8002",
     "run:local:middleware:data-management": "uvicorn middleware.data_management_api.app.main:app --reload --port 8003",
+    "run:local:middleware:product-catalog": "uvicorn middleware.product_catalog_api.app.main:app --reload --port 8004",
+
+    "seed:products": "python -m middleware.product_catalog_api.app.seed.generate_products --count 10000 --out data/product_catalog/products_seed.json",
 
     "//3": "─── RUN · PORTALS: Angular applications ──────────────────────",
     "run:local:portals:all": "bash DevOps/Local/portals/up.sh",

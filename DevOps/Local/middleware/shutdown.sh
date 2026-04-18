@@ -35,4 +35,5 @@ echo "▶ Shutting down middleware services..."
 stop_service admin_api            8001
 stop_service customer_api         8002
 stop_service data_management_api  8003
+stop_service product_catalog_api  8004
 echo "✔ Middleware shutdown complete."

@@ -28,3 +28,4 @@ echo "▶ Middleware status:"
 check admin_api            8001
 check customer_api         8002
 check data_management_api  8003
+check product_catalog_api  8004
