@@ -13,6 +13,9 @@ for arg in "$@"; do
   esac
 done
 
+echo "▶ Stopping MLflow..."
+docker compose -f mlflow/docker-compose.yml down "${DOWN_FLAGS[@]}" || true
+
 echo "▶ Stopping Observability..."
 docker compose -f Observability/docker-compose.yml down "${DOWN_FLAGS[@]}" || true
 

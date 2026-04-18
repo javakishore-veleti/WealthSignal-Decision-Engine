@@ -1,6 +1,7 @@
-# Observability stack — Prometheus + Grafana (metrics), Elasticsearch + Kibana
-# (logs), and the MLflow tracking server (experiment metadata). All services
-# attach to the shared 'wealthsignal-net' network.
+# Observability stack — Prometheus + Grafana (metrics) and Elasticsearch +
+# Kibana (logs). MLflow lives in its own stack at DevOps/Local/mlflow/ —
+# experiment tracking is an ML-lifecycle concern, not ops observability.
+# All services attach to the shared 'wealthsignal-net' network.
 
 name: wealthsignal-observability
 
@@ -76,29 +77,6 @@ services:
     networks:
       - wealthsignal-net
 
-  # ── Experiment tracking ────────────────────────────────────────────────────
-  mlflow:
-    # Community image that bundles MLflow + boto3 for artefact storage.
-    image: ghcr.io/mlflow/mlflow:v2.13.2
-    container_name: ws-mlflow
-    restart: unless-stopped
-    ports:
-      - "5000:5000"
-    environment:
-      BACKEND_STORE_URI: postgresql://wealthsignal:wealthsignal@postgres:5432/wealthsignal?options=-csearch_path%3Dmlflow
-      ARTIFACT_ROOT: /mlflow/artefacts
-    volumes:
-      - ws-mlflow-artefacts:/mlflow/artefacts
-    command: >
-      mlflow server
-        --host 0.0.0.0
-        --port 5000
-        --backend-store-uri postgresql://wealthsignal:wealthsignal@postgres:5432/wealthsignal?options=-csearch_path%3Dmlflow
-        --artifacts-destination /mlflow/artefacts
-        --serve-artifacts
-    networks:
-      - wealthsignal-net
-
 volumes:
   ws-prometheus-data:
     name: ws-prometheus-data
@@ -106,8 +84,6 @@ volumes:
     name: ws-grafana-data
   ws-es-data:
     name: ws-es-data
-  ws-mlflow-artefacts:
-    name: ws-mlflow-artefacts
 
 networks:
   wealthsignal-net:

@@ -1,0 +1,51 @@
+# MLflow experiment-tracking server — separate from the Observability stack
+# because experiment tracking is an ML-lifecycle concern, not ops monitoring.
+#
+# Two logical uses of this server:
+#   - 'production' operational runs from the decision engine (MLflow default
+#     experiments: wealth-form-classifier, wealth-segmentation, etc.)
+#   - 'mastery' learning experiments from the PyTorch weekend — keep these
+#     in experiments with the 'mastery/' prefix so they don't mix with
+#     production-intended runs. Both live in the same server, keyed by
+#     experiment name, so the learning code can still read production
+#     artefacts when needed.
+#
+# Backed by the shared Postgres instance (schema: mlflow).
+
+name: wealthsignal-mlflow
+
+services:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.13.2
+    container_name: ws-mlflow
+    restart: unless-stopped
+
+    ports:
+      - "5000:5000"
+
+    environment:
+      BACKEND_STORE_URI: postgresql://wealthsignal:wealthsignal@postgres:5432/wealthsignal?options=-csearch_path%3Dmlflow
+      ARTIFACT_ROOT: /mlflow/artefacts
+
+    volumes:
+      - ws-mlflow-artefacts:/mlflow/artefacts
+
+    command: >
+      mlflow server
+        --host 0.0.0.0
+        --port 5000
+        --backend-store-uri postgresql://wealthsignal:wealthsignal@postgres:5432/wealthsignal?options=-csearch_path%3Dmlflow
+        --artifacts-destination /mlflow/artefacts
+        --serve-artifacts
+
+    networks:
+      - wealthsignal-net
+
+volumes:
+  ws-mlflow-artefacts:
+    name: ws-mlflow-artefacts
+
+networks:
+  wealthsignal-net:
+    external: true
+    name: wealthsignal-net

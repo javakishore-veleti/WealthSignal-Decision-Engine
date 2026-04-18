@@ -34,6 +34,7 @@
     "run:local:docker:postgres": "docker compose -f DevOps/Local/postgres/docker-compose.yml up -d",
     "run:local:docker:kafka": "docker compose -f DevOps/Local/kafka/docker-compose.yml up -d",
     "run:local:docker:observability": "docker compose -f DevOps/Local/Observability/docker-compose.yml up -d",
+    "run:local:docker:mlflow": "docker compose -f DevOps/Local/mlflow/docker-compose.yml up -d",
 
     "//2": "─── RUN · MIDDLEWARE: FastAPI services ───────────────────────",
     "run:local:middleware:all": "bash DevOps/Local/middleware/up.sh",

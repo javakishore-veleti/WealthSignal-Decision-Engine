@@ -21,8 +21,11 @@ docker compose -f kafka/docker-compose.yml up -d
 echo "▶ Starting Airflow (scheduler, webserver, triggerer)..."
 docker compose -f airflow/docker-compose.yml up -d
 
-echo "▶ Starting Observability (Prometheus + Grafana + Elasticsearch + Kibana + MLflow)..."
+echo "▶ Starting Observability (Prometheus + Grafana + Elasticsearch + Kibana)..."
 docker compose -f Observability/docker-compose.yml up -d
+
+echo "▶ Starting MLflow tracking server..."
+docker compose -f mlflow/docker-compose.yml up -d
 
 # ── Simulate the GitHub 'Database Migration' workflow locally ───────────────
 # In cloud environments, .github/workflows/db-migrate.yml runs Alembic against
