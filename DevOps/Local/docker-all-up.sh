@@ -39,11 +39,24 @@ if ! docker image inspect wealthsignal/airflow:2.9.3 >/dev/null 2>&1; then
 fi
 docker compose -f airflow/docker-compose.yml up -d
 
-echo "▶ Starting Observability (Prometheus + Grafana + Elasticsearch + Kibana)..."
-docker compose -f Observability/docker-compose.yml up -d
-
 echo "▶ Starting MLflow tracking server..."
 docker compose -f mlflow/docker-compose.yml up -d
+
+# Observability stack (Prometheus + Grafana + Elasticsearch + Kibana) is
+# NOT started by default. Elasticsearch alone eats ~1.2 GB — on a 15-minute
+# restart cadence that's expensive, and nothing in the core flow
+# (portals / middleware / Airflow / MLflow) depends on it.
+#
+# Turn it on when you want Grafana / Kibana / Prometheus UIs:
+#     npm run run:local:docker:observability
+#
+# Or set WITH_OBSERVABILITY=1 before `npm run run:local:all` to include it.
+if [ "${WITH_OBSERVABILITY:-0}" = "1" ]; then
+  echo "▶ Starting Observability (Prometheus + Grafana + Elasticsearch + Kibana)..."
+  docker compose -f Observability/docker-compose.yml up -d
+else
+  echo "⏭  Observability stack skipped (set WITH_OBSERVABILITY=1 to include)."
+fi
 
 # ── Simulate the GitHub 'Database Migration' workflow locally ───────────────
 # In cloud environments, .github/workflows/db-migrate.yml runs Alembic against
@@ -67,8 +80,10 @@ echo "✔ Stack is up. Use 'npm run run:local:docker:status' to watch readiness.
 echo ""
 echo "  Airflow UI   →  http://localhost:8080   (user: admin / pass: admin)"
 echo "  MLflow UI    →  http://localhost:5050"
-echo "  Grafana      →  http://localhost:3000   (user: admin / pass: admin)"
-echo "  Prometheus   →  http://localhost:9090"
-echo "  Kibana       →  http://localhost:5601"
 echo "  Postgres     →  localhost:5432          (user: wealthsignal)"
 echo "  Kafka        →  localhost:9092"
+if [ "${WITH_OBSERVABILITY:-0}" = "1" ]; then
+  echo "  Grafana      →  http://localhost:3000   (user: admin / pass: admin)"
+  echo "  Prometheus   →  http://localhost:9090"
+  echo "  Kibana       →  http://localhost:5601"
+fi

@@ -52,6 +52,7 @@
     "run:local:docker:postgres": "docker compose -f DevOps/Local/postgres/docker-compose.yml up -d",
     "run:local:docker:kafka": "docker compose -f DevOps/Local/kafka/docker-compose.yml up -d",
     "run:local:docker:observability": "docker compose -f DevOps/Local/Observability/docker-compose.yml up -d",
+    "run:local:docker:observability:shutdown": "docker compose -f DevOps/Local/Observability/docker-compose.yml down",
     "run:local:docker:mlflow": "docker compose -f DevOps/Local/mlflow/docker-compose.yml up -d",
 
     "//2": "─── RUN · MIDDLEWARE: FastAPI services ───────────────────────",
@@ -73,8 +74,9 @@
     "run:local:portals:customer": "npm run start --workspace=portals/customer_portal",
 
     "//4": "─── RUN · STACK: everything at once ──────────────────────────",
-    "//run-all-doc": "run:local:all syncs Python deps first (pip install -e '.[dev,db,seed]' — idempotent, picks up any pyproject.toml change since the last run), then brings up docker → middleware → portals and opens the local-links page.",
+    "//run-all-doc": "run:local:all syncs Python deps, brings up docker → middleware → portals, opens the local-links page. Observability (Grafana/Prometheus/ES/Kibana) is OFF by default to save memory; use run:local:all:full or run:local:docker:observability to include it.",
     "run:local:all": "npm-run-all -s run:local:sync-deps run:local:docker:all run:local:middleware:all run:local:portals:all run:local:open-links",
+    "run:local:all:full": "WITH_OBSERVABILITY=1 npm-run-all -s run:local:sync-deps run:local:docker:all run:local:middleware:all run:local:portals:all run:local:open-links",
     "run:local:sync-deps": "conda run --prefix \"$HOME/runtime_data/python_venvs/WealthSignal-Decision-Engine\" pip install --quiet -e \".[dev,db,seed]\"",
     "run:local:open-links": "bash DevOps/Local/open-local-links.sh",
     "run:local:status": "npm-run-all -s run:local:docker:status run:local:middleware:status run:local:portals:status",
