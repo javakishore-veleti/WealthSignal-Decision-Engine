@@ -1,41 +1,56 @@
 # Kafka 3.7 in KRaft (no Zookeeper) mode — single broker for local development.
-# Used as the event bus between middleware services (async job events, drift
-# alerts, audit logs). Matches the architecture described in CONTRIBUTING.md.
+# Uses the official apache/kafka image because bitnami removed their free-tier
+# images from Docker Hub in mid-2025. Env var prefix is `KAFKA_*` (not
+# `KAFKA_CFG_*`, which was a bitnami convention).
 
 name: wealthsignal-kafka
 
 services:
   kafka:
-    image: bitnami/kafka:3.7
+    image: apache/kafka:3.7.2
     container_name: ws-kafka
     hostname: kafka
     restart: unless-stopped
 
     ports:
-      - "9092:9092"   # plaintext
-      - "9094:9094"   # external (for host-network clients)
+      - "9092:9092"   # internal (other containers on wealthsignal-net)
+      - "9094:9094"   # external (host clients, e.g. FastAPI services on the host)
 
     environment:
-      # KRaft mode (no Zookeeper).
-      KAFKA_CFG_NODE_ID: 1
-      KAFKA_CFG_PROCESS_ROLES: controller,broker
-      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      ALLOW_PLAINTEXT_LISTENER: "yes"
-      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+      # KRaft — combined broker + controller on a single node.
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+      # Single-broker replication factors (required at cluster bootstrap).
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_SHARE_COORDINATOR_STATE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_SHARE_COORDINATOR_STATE_TOPIC_MIN_ISR: 1
+
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+
+      # Stable cluster UUID so re-creating the container keeps the same ID.
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
 
     volumes:
-      - ws-kafka-data:/bitnami/kafka
+      - ws-kafka-data:/tmp/kraft-combined-logs
 
     healthcheck:
-      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
+      test:
+        - CMD-SHELL
+        - "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1 || exit 1"
       interval: 15s
       timeout: 10s
       retries: 10
+      start_period: 30s
 
     networks:
       - wealthsignal-net
