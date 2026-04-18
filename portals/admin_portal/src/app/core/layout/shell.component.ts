@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
 import { NgClass } from "@angular/common";
 import {
   NavigationEnd,
@@ -7,7 +7,7 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from "@angular/router";
-import { filter, map, startWith } from "rxjs/operators";
+import { filter, map, startWith } from "rxjs";
 import { toSignal } from "@angular/core/rxjs-interop";
 
 type TopSection = "dashboard" | "domain-services" | "administration";
@@ -247,20 +247,12 @@ export class ShellComponent {
   /** Current top-nav section derived from the URL. */
   readonly topSection = toSignal<TopSection>(
     this.router.events.pipe(
-      filter((e) => e instanceof NavigationEnd),
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
       startWith(null),
       map(() => this.resolveTopSection(this.router.url)),
     ),
     { initialValue: this.resolveTopSection(this.router.url) },
   );
-
-  readonly activeGroup = computed(() => {
-    // Auto-expand the group that matches the current top section.
-    const section = this.topSection();
-    if (section === "domain-services" && !this.group()) return "product-catalog";
-    if (section === "administration" && !this.group()) return "system-settings";
-    return this.group();
-  });
 
   toggleGroup(id: string): void {
     this.group.set(this.group() === id ? "" : id);

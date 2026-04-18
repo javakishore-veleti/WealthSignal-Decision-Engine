@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, inject, signal } from "@angular/core";
-import { CommonModule, DatePipe } from "@angular/common";
+import { CommonModule } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
 
 import { AdminService } from "../../core/services/admin.service";
@@ -15,7 +15,7 @@ interface ExperimentSlot {
 @Component({
   selector: "ws-mlflow-experiments",
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- Breadcrumb -->
