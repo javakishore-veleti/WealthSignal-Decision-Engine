@@ -33,13 +33,23 @@ services:
     volumes:
       - ws-mlflow-artefacts:/mlflow/artefacts
 
-    command: >
-      mlflow server
-        --host 0.0.0.0
-        --port 5000
-        --backend-store-uri postgresql://wealthsignal:wealthsignal@postgres:5432/wealthsignal?options=-csearch_path%3Dmlflow
-        --artifacts-destination /mlflow/artefacts
-        --serve-artifacts
+    # The ghcr.io/mlflow/mlflow image ships without a Postgres driver, so
+    # psycopg2-binary is pip-installed on every container start. It's
+    # cached inside the image layer on subsequent starts, so this adds
+    # ~2 s only on the first boot after a fresh volume wipe. `exec`
+    # replaces the shell with mlflow so SIGTERM on `docker stop`
+    # reaches the server for a graceful shutdown.
+    command:
+      - sh
+      - -c
+      - |
+        pip install --quiet --no-cache-dir psycopg2-binary==2.9.9 && \
+        exec mlflow server \
+          --host 0.0.0.0 \
+          --port 5000 \
+          --backend-store-uri 'postgresql://wealthsignal:wealthsignal@postgres:5432/wealthsignal?options=-csearch_path%3Dmlflow' \
+          --artifacts-destination /mlflow/artefacts \
+          --serve-artifacts
 
     networks:
       - wealthsignal-net
