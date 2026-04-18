@@ -36,6 +36,12 @@ db = [
     "psycopg[binary]>=3.1",
 ]
 
+# Seed-data generation — only needed when rebuilding the Product Catalog
+# JSON (one-off). Not required at API runtime.
+seed = [
+    "faker>=25.0",
+]
+
 dev = [
     "ruff==0.4.*",
     "black==24.*",
