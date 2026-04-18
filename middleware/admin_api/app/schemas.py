@@ -86,3 +86,34 @@ class AuditEvent(BaseModel):
     subject: str
     details: dict = Field(default_factory=dict)
     timestamp: datetime
+
+
+# ── System health aggregator ─────────────────────────────────────────────────
+
+
+class ServiceStatus(StrEnum):
+    UP = "up"
+    DEGRADED = "degraded"  # reachable but health is "warning" / slow
+    DOWN = "down"  # connection refused / timeout
+
+
+class OverallStatus(StrEnum):
+    HEALTHY = "healthy"  # every critical service up
+    DEGRADED = "degraded"  # some services down but core (admin_api) is up
+    UNREACHABLE = "unreachable"  # consumer couldn't even reach admin_api
+
+
+class ServiceHealth(BaseModel):
+    name: str
+    url: str
+    status: ServiceStatus
+    latency_ms: int | None = None
+    error: str | None = None
+    critical: bool = True  # false = 'nice to have' (e.g., Kafka)
+
+
+class SystemHealthResponse(BaseModel):
+    overall: OverallStatus
+    checked_at: datetime
+    services: list[ServiceHealth]
+    summary: dict[str, int]  # {"up": 5, "down": 1, "degraded": 0}

@@ -10,6 +10,8 @@ import {
 import { filter, map, startWith } from "rxjs";
 import { toSignal } from "@angular/core/rxjs-interop";
 
+import { HealthBadgeComponent } from "./health-badge.component";
+
 type TopSection = "dashboard" | "domain-services" | "administration";
 
 /**
@@ -19,7 +21,7 @@ type TopSection = "dashboard" | "domain-services" | "administration";
 @Component({
   selector: "ws-shell",
   standalone: true,
-  imports: [NgClass, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [NgClass, RouterLink, RouterLinkActive, RouterOutlet, HealthBadgeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./shell.component.scss",
   template: `
@@ -56,6 +58,9 @@ type TopSection = "dashboard" | "domain-services" | "administration";
           </nav>
 
           <div class="flex-1"></div>
+
+          <!-- System health badge (click for per-service breakdown) -->
+          <ws-health-badge class="hidden sm:block"></ws-health-badge>
 
           <!-- Environment pill -->
           <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full

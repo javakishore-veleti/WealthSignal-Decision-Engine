@@ -19,7 +19,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routes import health, jobs, mlflow, models, product_catalog
+from .routes import health, jobs, mlflow, models, product_catalog, system_health
 
 logger = logging.getLogger("admin_api")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -38,6 +38,7 @@ app = FastAPI(
         {"name": "product-catalog", "description": "Admin actions for product_catalog_api data."},
         {"name": "mlflow", "description": "MLflow bootstrap + experiment lifecycle triggers."},
         {"name": "jobs", "description": "Async job-status polling."},
+        {"name": "system", "description": "Aggregated system-health probe for the top-bar badge."},
     ],
 )
 
@@ -57,6 +58,7 @@ app.include_router(models.router)
 app.include_router(product_catalog.router)
 app.include_router(mlflow.router)
 app.include_router(jobs.router)
+app.include_router(system_health.router)
 
 
 @app.get("/", include_in_schema=False)
