@@ -1,5 +1,5 @@
 """
-Product Catalog admin actions.
+Product Catalog admin actions (and related bootstrap triggers).
 
 Primary endpoint: POST /api/v1/product-catalog/initial-load
   Triggered from the admin_portal's 'Domain Services → Product Catalog →

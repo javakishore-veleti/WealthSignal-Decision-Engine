@@ -1,0 +1,104 @@
+# WealthSignal Decision Engine — DVC pipeline definition.
+#
+# Every `cmd` below is the canonical invocation Airflow DAGs use when
+# they invoke their stage: `dvc repro <stage>` runs the same command,
+# guaranteeing reproducibility between ad-hoc local runs and scheduled
+# Airflow executions.
+#
+# The stage bodies rely on modules that land in follow-up PRs (PT-03+);
+# DVC parses the graph regardless, so `dvc dag` and `dvc status` work
+# today.
+
+stages:
+
+  # ── Data ingestion ──────────────────────────────────────────────────────
+  ingest_home_credit:
+    cmd: python -m engine.wealthsignal.data.ingest --dataset home_credit
+    deps:
+      - engine/wealthsignal/data/ingest.py
+      - engine/wealthsignal/config/conf/data/home_credit.yaml
+    outs:
+      - data/raw/home_credit/
+
+  ingest_lending_club:
+    cmd: python -m engine.wealthsignal.data.ingest --dataset lending_club
+    deps:
+      - engine/wealthsignal/data/ingest.py
+      - engine/wealthsignal/config/conf/data/lending_club.yaml
+    outs:
+      - data/raw/lending_club/
+
+  ingest_otto:
+    cmd: python -m engine.wealthsignal.data.ingest --dataset otto
+    deps:
+      - engine/wealthsignal/data/ingest.py
+      - engine/wealthsignal/config/conf/data/otto.yaml
+    outs:
+      - data/raw/otto/
+
+  # ── Data validation + feature engineering ──────────────────────────────
+  validate_expectations:
+    cmd: python -m engine.wealthsignal.data.validate
+    deps:
+      - data/raw/home_credit/
+      - data/raw/lending_club/
+    outs:
+      - docs/data_quality/expectation_report.html
+
+  engineer_features:
+    cmd: python -m engine.wealthsignal.data.features
+    deps:
+      - data/raw/home_credit/
+      - data/raw/lending_club/
+      - engine/wealthsignal/data/features.py
+    outs:
+      - data/processed/features.parquet
+
+  # ── Training ────────────────────────────────────────────────────────────
+  train_form_classifier:
+    cmd: python -m engine.wealthsignal.training.train model=form_classifier
+    deps:
+      - data/processed/features.parquet
+      - engine/wealthsignal/models/form_classifier.py
+      - engine/wealthsignal/config/conf/model/form_classifier.yaml
+    outs:
+      - models/form_classifier/
+    metrics:
+      - metrics/form_classifier.json:
+          cache: false
+
+  train_segmentation:
+    cmd: python -m engine.wealthsignal.training.train model=segmentation
+    deps:
+      - data/processed/features.parquet
+      - engine/wealthsignal/models/segmentation.py
+      - engine/wealthsignal/config/conf/model/segmentation.yaml
+    outs:
+      - models/segmentation/
+    metrics:
+      - metrics/segmentation.json:
+          cache: false
+
+  train_sequence:
+    cmd: python -m engine.wealthsignal.training.train model=sequence
+    deps:
+      - data/raw/otto/
+      - engine/wealthsignal/models/sequence.py
+      - engine/wealthsignal/config/conf/model/sequence.yaml
+    outs:
+      - models/sequence/
+    metrics:
+      - metrics/sequence.json:
+          cache: false
+
+  train_rl_policy:
+    cmd: python -m engine.wealthsignal.training.train model=rl_policy
+    deps:
+      - models/sequence/
+      - engine/wealthsignal/models/rl_policy.py
+      - engine/wealthsignal/config/conf/model/rl_policy.yaml
+    outs:
+      - models/rl_policy/
+    metrics:
+      - metrics/rl_policy.json:
+          cache: false

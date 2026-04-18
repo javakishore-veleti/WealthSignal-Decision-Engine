@@ -1,0 +1,7 @@
+/config.local
+/tmp
+/lock
+/cache
+/plots
+/updater
+/updater.lock

@@ -1,0 +1,21 @@
+[core]
+    remote = kaggle-cache
+    autostage = true
+    analytics = false
+
+# Default remote — local cache shared across the team via a mounted
+# drive or object store (swap the URL for s3://, gs:// or azure:// in
+# staging / production envs; the `kaggle-cache` name stays the same so
+# dvc.yaml never changes).
+['remote "kaggle-cache"']
+    url = /tmp/wealthsignal-dvc-remote
+
+# Secondary remote for cloud deployments. Uncomment and set env vars
+# (AWS_PROFILE / GOOGLE_APPLICATION_CREDENTIALS / AZURE_STORAGE_KEY)
+# before `dvc push` in a cloud CI job.
+# ['remote "s3-prod"']
+#     url = s3://wealthsignal-datasets/dvc
+# ['remote "gcs-prod"']
+#     url = gs://wealthsignal-datasets/dvc
+# ['remote "azure-prod"']
+#     url = azure://wealthsignal/datasets

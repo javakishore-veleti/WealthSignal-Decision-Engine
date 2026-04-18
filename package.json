@@ -20,13 +20,15 @@
   "scripts": {
     "//": "─── SETUP: one-time local dev environment ───────────────────────",
     "//setup-doc": "setup:local:all creates the conda env at $HOME/runtime_data/python_venvs/WealthSignal-Decision-Engine, scaffolds engine/wealthsignal/, pip-installs the project inside the env, installs portal deps, wires pre-commit hooks, and prints the activation command at the end.",
-    "setup:local:all": "npm-run-all -s setup:local:conda setup:local:scaffold setup:local:python setup:local:portals setup:local:precommit setup:local:post",
+    "setup:local:all": "npm-run-all -s setup:local:conda setup:local:scaffold setup:local:python setup:local:portals setup:local:precommit setup:local:dvc setup:local:post",
     "setup:local:conda": "bash DevOps/Local/python/create-env.sh",
     "setup:local:scaffold": "bash DevOps/Local/python/scaffold.sh",
     "setup:local:python": "conda run --prefix \"$HOME/runtime_data/python_venvs/WealthSignal-Decision-Engine\" pip install -e \".[dev,db,seed]\"",
     "setup:local:portals": "npm install",
     "setup:local:precommit": "conda run --prefix \"$HOME/runtime_data/python_venvs/WealthSignal-Decision-Engine\" pre-commit install",
     "setup:local:airflow": "bash DevOps/Local/airflow/init.sh",
+    "setup:local:dvc": "bash DevOps/Local/python/dvc-init.sh",
+    "setup:local:mlflow:experiments": "mkdir -p .local/logs && curl -sS -X POST http://localhost:8001/api/v1/mlflow/bootstrap-experiments | tee .local/logs/mlflow-bootstrap.json",
     "setup:local:post": "bash DevOps/Local/python/post-setup.sh",
 
     "//env-doc": "Activation must run in the caller's shell — npm scripts cannot modify the parent shell's PATH. setup:local:activate / env:activate print the exact source command; copy-paste or run:   source DevOps/Local/python/activate.sh",

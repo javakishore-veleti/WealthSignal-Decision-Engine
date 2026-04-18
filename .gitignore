@@ -4,6 +4,16 @@ node_modules/
 dist/
 .angular/
 
+# ── DVC-tracked training artefacts (metadata is committed, blobs are not) ──
+/data/raw/
+/data/processed/
+/models/
+/metrics/
+/outputs/
+/.dvc/cache/
+/.dvc/tmp/
+/.dvc/plots/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

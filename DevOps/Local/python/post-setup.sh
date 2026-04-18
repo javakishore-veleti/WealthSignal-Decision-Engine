@@ -25,6 +25,9 @@ cat <<EOF
   Start the full stack (infra + middleware + portals):
       npm run run:local:all
 
+  Create MLflow experiments (after the stack is up):
+      npm run setup:local:mlflow:experiments
+
   Inspect status:
       npm run run:local:status
 
