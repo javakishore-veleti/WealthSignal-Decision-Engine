@@ -12,13 +12,15 @@ One command bootstraps everything: conda env, package scaffold, Python deps, por
 
 | Command | What it does |
 |---|---|
-| `npm run setup:local:all` | **Full bootstrap.** Chains all the steps below in order. |
+| `npm run setup:local:all` | **Full bootstrap.** Runs `npm install` first so the devDependency `npm-run-all` is available, then chains every step below. |
 | `npm run setup:local:conda` | Creates (or updates) the conda env at `$HOME/runtime_data/python_venvs/WealthSignal-Decision-Engine`. Idempotent. |
 | `npm run setup:local:scaffold` | Creates `engine/wealthsignal/{config,data,models,training,serving,utils,tracking}/__init__.py`. Never overwrites existing files. |
 | `npm run setup:local:python` | `pip install -e .[dev,db,seed]` inside the conda env. |
-| `npm run setup:local:portals` | Installs npm workspace dependencies for `admin_portal` + `customer_portal`. |
-| `npm run setup:local:precommit` | Wires `pre-commit` hooks for ruff + black. |
-| `npm run setup:local:airflow` | Runs the Airflow DB migration + admin-user bootstrap (needs Postgres up). |
+| `npm run setup:local:portals` | `npm install` — Angular workspace deps. Usually redundant after `setup:local:all`; run standalone to refresh portal deps only. |
+| `npm run setup:local:precommit` | Wires `pre-commit` hooks for ruff + black + mypy + shellcheck. |
+| `npm run setup:local:dvc` | Installs DVC into the conda env, creates the local remote cache, validates `.dvc/config` + `dvc.yaml`. |
+| `npm run setup:local:airflow` | Airflow DB migration + admin-user bootstrap (needs Postgres up). |
+| `npm run setup:local:mlflow:experiments` | Triggers `bootstrap_mlflow_experiments` DAG via `admin_api` (needs the stack up). |
 | `npm run setup:local:post` | Prints the final banner with next-step commands. |
 
 **Right after setup finishes:**

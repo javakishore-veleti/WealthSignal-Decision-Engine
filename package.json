@@ -19,8 +19,8 @@
   ],
   "scripts": {
     "//": "─── SETUP: one-time local dev environment ───────────────────────",
-    "//setup-doc": "setup:local:all creates the conda env at $HOME/runtime_data/python_venvs/WealthSignal-Decision-Engine, scaffolds engine/wealthsignal/, pip-installs the project inside the env, installs portal deps, wires pre-commit hooks, and prints the activation command at the end.",
-    "setup:local:all": "npm-run-all -s setup:local:conda setup:local:scaffold setup:local:python setup:local:portals setup:local:precommit setup:local:dvc setup:local:post",
+    "//setup-doc": "setup:local:all is the bootstrap entrypoint for a fresh clone. It runs `npm install` first (which installs the devDependency npm-run-all AND populates the Angular workspace node_modules), then chains every other setup step through npm-run-all.",
+    "setup:local:all": "npm install && npm-run-all -s setup:local:conda setup:local:scaffold setup:local:python setup:local:precommit setup:local:dvc setup:local:post",
     "setup:local:conda": "bash DevOps/Local/python/create-env.sh",
     "setup:local:scaffold": "bash DevOps/Local/python/scaffold.sh",
     "setup:local:python": "conda run --prefix \"$HOME/runtime_data/python_venvs/WealthSignal-Decision-Engine\" pip install -e \".[dev,db,seed]\"",
